@@ -18,16 +18,18 @@ export default function Dashboard() {
         headers: { Authorization: `Bearer ${token}` }
       });
 
+      const json = await res.json();
+
       if (!res.ok) {
-        const errJson = await res.json();
-        setErro(errJson.error || "Erro ao carregar dashboard");
+        setErro(json.error || "Erro ao carregar dashboard");
+        setDados({});
         return;
       }
 
-      const json = await res.json();
       setDados(json);
     } catch (err) {
       setErro("Erro ao carregar dashboard");
+      setDados({});
     }
   };
 
@@ -47,26 +49,26 @@ export default function Dashboard() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <div className="bg-white shadow p-4 rounded-xl">
             <p className="text-sm text-gray-500">Pagamentos (24h)</p>
-            <p className="text-2xl font-bold">{dados?.pagamentos?.ultimas_24h || 0}</p>
+            <p className="text-2xl font-bold">{dados?.pagamentos?.ultimas_24h ?? "-"}</p>
           </div>
           <div className="bg-white shadow p-4 rounded-xl">
             <p className="text-sm text-gray-500">Pagamentos (total)</p>
-            <p className="text-2xl font-bold">{dados?.pagamentos?.total || 0}</p>
+            <p className="text-2xl font-bold">{dados?.pagamentos?.total ?? "-"}</p>
           </div>
           <div className="bg-white shadow p-4 rounded-xl">
             <p className="text-sm text-gray-500">Usuários Radius</p>
-            <p className="text-2xl font-bold">{dados?.radius?.total_usuarios || 0}</p>
+            <p className="text-2xl font-bold">{dados?.radius?.total_usuarios ?? "-"}</p>
           </div>
           <div className="bg-white shadow p-4 rounded-xl">
             <p className="text-sm text-gray-500">Mikrotiks Online</p>
             <p className="text-2xl font-bold">
-              {dados?.mikrotiks?.online || 0} / {dados?.mikrotiks?.total || 0}
+              {dados?.mikrotiks?.online ?? "-"} / {dados?.mikrotiks?.total ?? "-"}
             </p>
           </div>
         </div>
       )}
 
-      {dados?.sessoes && dados.sessoes.length > 0 && (
+      {dados?.sessoes?.length > 0 && (
         <div className="mt-8">
           <h2 className="text-xl font-semibold mb-4">👥 Sessões Ativas por Mikrotik</h2>
           <ul className="bg-white shadow rounded-xl p-4 space-y-2">
