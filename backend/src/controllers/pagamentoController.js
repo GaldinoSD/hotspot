@@ -1,0 +1,241 @@
+const db = require("../config/db");
+const { getConfig } = require("../models/ConfigMercadoPago");
+const axios = require("axios");
+const { v4: uuidv4 } = require("uuid");
+const { liberarUsuario } = require("./mikrotikAPIController");
+
+exports.gerarPagamento = async (req, res) => {
+  const { plano_id, mac, ip, cpf } = req.body;
+
+  try {
+    const [planos] = await db.query("SELECT * FROM planos WHERE id = ?", [plano_id]);
+    const plano = planos[0];
+
+    if (!plano) return res.status(404).json({ message: "Plano não encontrado." });
+
+    const config = await getConfig();
+    if (!config || !config.access_token) {
+      return res.status(400).json({ message: "Configuração do Mercado Pago não encontrada." });
+    }
+
+    const response = await axios.post(
+      "https://api.mercadopago.com/v1/payments",
+      {
+        transaction_amount: parseFloat(plano.valor) / 100,
+        description: plano.nome,
+        payment_method_id: "pix",
+        payer: {
+          email: "comprador@forumtelecom.com.br"
+        }
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${config.access_token}`,
+          "Content-Type": "application/json",
+          "X-Idempotency-Key": uuidv4()
+        },
+      }
+    );
+
+    const { qr_code_base64, qr_code } = response.data.point_of_interaction.transaction_data;
+    const mpPagamentoId = response.data.id;
+
+    await db.query(`
+      INSERT INTO pagamentos (plano_id, ip, mac, cpf, nome_plano, valor, status, mp_pagamento_id)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    `, [plano.id, ip, mac, cpf || null, plano.nome, plano.valor, "aguardando", mpPagamentoId]);
+
+    res.json({
+      qr_code_base64,
+      copia_cola: qr_code,
+    });
+  } catch (error) {
+    console.error("Erro ao gerar pagamento:", error.response?.data || error.message);
+    res.status(500).json({ message: "Erro ao gerar pagamento." });
+  }
+};
+
+exports.notificacaoWebhook = async (req, res) => {
+  try {
+    console.log("📥 Webhook recebido:", JSON.stringify(req.body, null, 2));
+
+    const topic = req.body.topic || req.body.type;
+    if (topic !== "payment") {
+      console.log(`⚠️ Evento ignorado: topic=${topic}`);
+      return res.sendStatus(200);
+    }
+
+    const mpPagamentoId = req.body.data?.id;
+    if (!mpPagamentoId) return res.sendStatus(400);
+
+    const config = await getConfig();
+    if (!config?.access_token) return res.sendStatus(401);
+
+    const response = await axios.get(
+      `https://api.mercadopago.com/v1/payments/${mpPagamentoId}`,
+      { headers: { Authorization: `Bearer ${config.access_token}` } }
+    );
+    const pagamento = response.data;
+
+    console.log("✅ Status do pagamento:", pagamento.status);
+
+    if (pagamento.status === "approved") {
+      const planoNome = pagamento.description;
+      const valorPago = pagamento.transaction_amount;
+      const email = pagamento.payer?.email || null;
+
+      const [existente] = await db.query(
+        "SELECT id FROM pagamentos WHERE mp_pagamento_id = ?",
+        [mpPagamentoId]
+      );
+
+     if (existente.length > 0) {
+  const [planoInfo] = await db.query("SELECT duracao_minutos FROM planos WHERE nome = ?", [planoNome]);
+  const duracao = planoInfo[0]?.duracao_minutos || 60;
+
+  await db.query(
+    `UPDATE pagamentos SET status = 'approved', email = ?, expira_em = DATE_ADD(NOW(), INTERVAL ? MINUTE)
+     WHERE mp_pagamento_id = ?`,
+    [email, duracao, mpPagamentoId]
+  );
+} else {
+  const [planos] = await db.query("SELECT id, duracao_minutos FROM planos WHERE nome = ?", [planoNome]);
+  const planoId = planos[0]?.id || null;
+  const duracao = planos[0]?.duracao_minutos || 60;
+
+  await db.query(`
+    INSERT INTO pagamentos (plano_id, email, nome_plano, valor, status, mp_pagamento_id, expira_em)
+    VALUES (?, ?, ?, ?, ?, ?, DATE_ADD(NOW(), INTERVAL ? MINUTE))
+  `, [planoId, email, planoNome, valorPago, pagamento.status, mpPagamentoId, duracao]);
+}
+      const [info] = await db.query("SELECT mac, ip, nome_plano FROM pagamentos WHERE mp_pagamento_id = ?", [mpPagamentoId]);
+      const { mac, ip, nome_plano } = info[0] || {};
+
+      if (mac && nome_plano) {
+        await liberarUsuario({ mac, ip, plano: nome_plano });
+      }
+
+      console.log("✅ Pagamento aprovado registrado ou atualizado:", mpPagamentoId);
+    } else {
+      console.log(`🔁 Pagamento status não aprovado: ${pagamento.status}`);
+    }
+
+    res.sendStatus(200);
+  } catch (error) {
+    console.error("❌ Erro no webhook:", error.response?.data || error.message);
+    res.sendStatus(500);
+  }
+};
+
+exports.listarPagamentosAprovados = async (req, res) => {
+  try {
+    const [rows] = await db.query(`
+      SELECT id, plano_id, nome_plano, email, valor, status, criado_em
+      FROM pagamentos
+      WHERE status = 'approved'
+      ORDER BY criado_em DESC
+    `);
+    res.json(rows);
+  } catch (error) {
+    console.error("Erro ao buscar pagamentos:", error);
+    res.status(500).json({ message: "Erro ao buscar pagamentos." });
+  }
+};
+
+exports.listarTodosPagamentos = async (req, res) => {
+  try {
+    const [rows] = await db.query(`
+      SELECT id, plano_id, nome_plano, email, valor, status, criado_em, mac, ip
+      FROM pagamentos
+      ORDER BY criado_em DESC
+    `);
+    res.json(rows);
+  } catch (error) {
+    console.error("Erro ao buscar pagamentos:", error);
+    res.status(500).json({ message: "Erro ao buscar pagamentos." });
+  }
+};
+
+exports.liberarManual = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Busca os dados do pagamento
+    const [pagamento] = await db.query(
+      "SELECT mac, ip, nome_plano, plano_id FROM pagamentos WHERE id = ?",
+      [id]
+    );
+
+    if (!pagamento.length) {
+      return res.status(404).json({ message: "Pagamento não encontrado." });
+    }
+
+    const { mac, ip, nome_plano, plano_id } = pagamento[0];
+
+    // Busca duração do plano
+    const [planoInfo] = await db.query(
+      "SELECT duracao_minutos FROM planos WHERE id = ?",
+      [plano_id]
+    );
+    const duracao = planoInfo[0]?.duracao_minutos || 60;
+
+    // Libera o usuário no Mikrotik
+    await liberarUsuario({ mac, ip, plano: nome_plano });
+
+    // Atualiza status e expiração
+    await db.query(
+      "UPDATE pagamentos SET status = 'approved', expira_em = DATE_ADD(NOW(), INTERVAL ? MINUTE) WHERE id = ?",
+      [duracao, id]
+    );
+
+    res.json({ message: "Usuário liberado manualmente." });
+  } catch (error) {
+    console.error("Erro ao liberar manualmente:", error.message);
+    res.status(500).json({ message: "Erro ao liberar manualmente." });
+  }
+};
+
+exports.verificarStatusPagamento = async (req, res) => {
+  try {
+    const { mac, ip } = req.query;
+    console.log("📡 Verificando status para:", mac, ip);
+
+    const [pagamento] = await db.query(
+      "SELECT status, nome_plano FROM pagamentos WHERE mac = ? AND ip = ? ORDER BY criado_em DESC LIMIT 1",
+      [mac, ip]
+    );
+
+    if (!pagamento.length) {
+      console.log("⚠️ Nenhum pagamento encontrado.");
+      return res.status(404).json({ status: "nao_encontrado" });
+    }
+
+    const { status, nome_plano } = pagamento[0];
+    console.log(`ℹ️ Pagamento encontrado: status=${status}, plano=${nome_plano}`);
+
+    const [mikrotikResult] = await db.query(
+      `SELECT m.end_hotspot, m.ip FROM mikrotiks m
+       JOIN planos p ON p.mikrotik_id = m.id
+       WHERE p.nome = ? LIMIT 1`,
+      [nome_plano]
+    );
+
+    const mikrotik = mikrotikResult[0];
+    const gateway = mikrotik?.end_hotspot || mikrotik?.ip || null;
+
+    if (!mikrotik) {
+      console.warn("⚠️ Mikrotik não encontrado para o plano.");
+    }
+
+    if (status === "approved") {
+      console.log("✅ Pagamento aprovado. Liberando usuário no RADIUS...");
+      await liberarUsuario({ mac, ip, plano: nome_plano });
+    }
+
+    res.json({ status, gateway });
+  } catch (error) {
+    console.error("❌ Erro ao verificar status:", error.message);
+    res.status(500).json({ message: "Erro interno ao verificar status." });
+  }
+};
+
