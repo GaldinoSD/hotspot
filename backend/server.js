@@ -188,188 +188,28 @@ app.get("/api/hotspot-login/:mikrotikId", async (req, res) => {
   }
 });
 
-// Endpoint público: serve status.html para MikroTik baixar via /tool/fetch
-// O RouterOS substitui $(username), $(ip), $(uptime), $(bytes-in-nice), etc
 app.get("/api/hotspot-status/:mikrotikId", async (req, res) => {
+  const { mikrotikId } = req.params;
   try {
+    const systemDomain = process.env.SYSTEM_DOMAIN || req.hostname;
+    // Detectar protocolo com base no domínio de produção vs ip/localhost local
+    const protocol = (systemDomain.includes("localhost") || systemDomain.match(/^\d+\.\d+\.\d+\.\d+$/)) ? "http" : "https";
+    
     const html = `<!DOCTYPE html>
 <html>
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="pragma" content="no-cache">
-  <meta http-equiv="expires" content="-1">
-  $(if refresh-timeout)<meta http-equiv="refresh" content="$(refresh-timeout-secs)">$(endif)
   <title>Status - Hotspot</title>
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      background: #0f111a; color: #e2e8f0;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      min-height: 100vh; display: flex; align-items: center; justify-content: center;
-      padding: 20px;
-    }
-    .card {
-      background: #1a1d27; border: 1px solid #2d3348; border-radius: 16px;
-      padding: 32px; max-width: 420px; width: 100%;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.4);
-    }
-    .header { text-align: center; margin-bottom: 24px; }
-    .avatar {
-      width: 64px; height: 64px; border-radius: 50%;
-      background: linear-gradient(135deg, #3b82f6, #2563eb);
-      display: flex; align-items: center; justify-content: center;
-      margin: 0 auto 16px; font-size: 24px; color: white; font-weight: bold;
-    }
-    .header h1 { font-size: 20px; font-weight: 700; color: #f1f5f9; }
-    .header p { font-size: 13px; color: #64748b; margin-top: 4px; }
-    .status-badge {
-      display: inline-flex; align-items: center; gap: 6px;
-      background: #065f46; color: #6ee7b7; padding: 4px 12px;
-      border-radius: 20px; font-size: 12px; font-weight: 600; margin-top: 8px;
-    }
-    .status-dot { width: 8px; height: 8px; background: #34d399; border-radius: 50%; animation: pulse 2s infinite; }
-    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
-    .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 20px 0; }
-    .stat {
-      background: #0d1117; border: 1px solid #2d3348; border-radius: 12px; padding: 16px;
-      text-align: center;
-    }
-    .stat-label { font-size: 11px; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
-    .stat-value { font-size: 18px; font-weight: 700; color: #f1f5f9; }
-    .stat-value.blue { color: #60a5fa; }
-    .stat-value.green { color: #34d399; }
-    .stat-value.orange { color: #fb923c; }
-    .info-row {
-      display: flex; justify-content: space-between; align-items: center;
-      padding: 10px 0; border-bottom: 1px solid #1e2235;
-      font-size: 13px;
-    }
-    .info-row:last-child { border-bottom: none; }
-    .info-label { color: #64748b; }
-    .info-value { color: #e2e8f0; font-weight: 500; font-family: monospace; }
-    .btn-logout {
-      display: block; width: 100%; padding: 14px;
-      background: linear-gradient(135deg, #dc2626, #b91c1c);
-      color: white; border: none; border-radius: 12px;
-      font-size: 14px; font-weight: 600; cursor: pointer;
-      margin-top: 20px; transition: all 0.2s;
-    }
-    .btn-logout:hover { opacity: 0.9; transform: translateY(-1px); }
-    .footer { text-align: center; margin-top: 16px; font-size: 11px; color: #475569; }
-    $(if refresh-timeout).refresh-bar {
-      height: 3px; background: #1e293b; border-radius: 2px; margin-top: 16px; overflow: hidden;
-    }
-    .refresh-bar-fill {
-      height: 100%; background: linear-gradient(90deg, #3b82f6, #60a5fa);
-      animation: refill $(refresh-timeout-secs)s linear infinite;
-    }
-    @keyframes refill { from { width: 0%; } to { width: 100%; } }
-    $(endif)
-  </style>
   <script>
-    $(if advert-pending == 'yes')
-    function openAdvert() {
-      window.open('$(link-advert)', 'hotspot_advert', '');
-    }
-    $(endif)
-    function doLogout() {
-      if (window.name == 'hotspot_status') {
-        window.open('$(link-logout)', 'hotspot_logout', 'toolbar=0,location=0,status=0,menubar=0,resizable=1,width=300,height=200');
-        window.close();
-        return false;
-      }
-      return true;
-    }
+    var domain = "${systemDomain}";
+    var finalUrl = "${protocol}://" + domain + "/api/hotspot-status/redirect/${mikrotikId}?mac=$(mac)&ip=$(ip)&username=$(username)&link_logout=$(link-logout)&link_orig=$(link-orig)&uptime=$(uptime)&bytes_in=$(bytes-in-nice)&bytes_out=$(bytes-out-nice)";
+    window.location.replace(finalUrl);
   </script>
 </head>
-<body $(if advert-pending == 'yes')onload="openAdvert()"$(endif)>
-  <div class="card">
-    <div class="header">
-      <div class="avatar">
-        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>
-      </div>
-      $(if login-by == 'trial')
-        <h1>Acesso Trial</h1>
-      $(elif login-by != 'mac')
-        <h1>$(username)</h1>
-      $(else)
-        <h1>Conectado</h1>
-      $(endif)
-      <p>Sessao hotspot ativa</p>
-      <div class="status-badge">
-        <span class="status-dot"></span>
-        Online
-      </div>
-    </div>
-
-    <div class="stats">
-      <div class="stat">
-        <div class="stat-label">Tempo Online</div>
-        <div class="stat-value green">$(uptime)</div>
-      </div>
-      $(if session-time-left)
-      <div class="stat">
-        <div class="stat-label">Tempo Restante</div>
-        <div class="stat-value orange">$(session-time-left)</div>
-      </div>
-      $(else)
-      <div class="stat">
-        <div class="stat-label">IP</div>
-        <div class="stat-value blue">$(ip)</div>
-      </div>
-      $(endif)
-      <div class="stat">
-        <div class="stat-label">Download</div>
-        <div class="stat-value blue">$(bytes-out-nice)</div>
-      </div>
-      <div class="stat">
-        <div class="stat-label">Upload</div>
-        <div class="stat-value">$(bytes-in-nice)</div>
-      </div>
-    </div>
-
-    <div style="background:#0d1117;border:1px solid #2d3348;border-radius:12px;padding:14px;margin-bottom:8px;">
-      <div class="info-row">
-        <span class="info-label">Endereco IP</span>
-        <span class="info-value">$(ip)</span>
-      </div>
-      <div class="info-row">
-        <span class="info-label">MAC Address</span>
-        <span class="info-value">$(mac)</span>
-      </div>
-      $(if session-time-left)
-      <div class="info-row">
-        <span class="info-label">Conectado / Restante</span>
-        <span class="info-value">$(uptime) / $(session-time-left)</span>
-      </div>
-      $(endif)
-      $(if blocked == 'yes')
-      <div class="info-row">
-        <span class="info-label">Status</span>
-        <span class="info-value" style="color:#fb923c;">
-          <a href="$(link-advert)" target="hotspot_advert" style="color:#fb923c;text-decoration:none;">Publicidade pendente</a>
-        </span>
-      </div>
-      $(elif refresh-timeout)
-      <div class="info-row">
-        <span class="info-label">Atualiza em</span>
-        <span class="info-value">$(refresh-timeout)</span>
-      </div>
-      $(endif)
-    </div>
-
-    $(if login-by-mac != 'yes')
-    <form action="$(link-logout)" name="logout" onsubmit="return doLogout()">
-      <button type="submit" class="btn-logout">Desconectar</button>
-    </form>
-    $(endif)
-
-    $(if refresh-timeout)
-    <div class="refresh-bar"><div class="refresh-bar-fill"></div></div>
-    $(endif)
-
-    <div class="footer">Hotspot WiFi &bull; Protegido por LGPD</div>
+<body style="background: #0f111a; color: #fff; font-family: -apple-system, sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0;">
+  <div style="text-align: center;">
+    <h2 style="font-weight: 500; font-size: 18px;">Autenticado com sucesso!</h2>
+    <p style="color: #64748b; font-size: 13px; margin-top: 5px;">Redirecionando para o painel de navegação...</p>
   </div>
 </body>
 </html>`;
@@ -379,6 +219,585 @@ app.get("/api/hotspot-status/:mikrotikId", async (req, res) => {
     res.send(html);
   } catch (err) {
     res.status(500).send("<h1>Erro</h1>");
+  }
+});
+
+// Novo endpoint público para tratamento dinâmico pós-login (redirecionamento ou status estilizado)
+app.get("/api/hotspot-status/redirect/:mikrotikId", async (req, res) => {
+  const { mikrotikId } = req.params;
+  const { mac, ip, username, link_logout, link_orig, uptime, bytes_in, bytes_out } = req.query;
+
+  try {
+    const [[mikrotik]] = await db.execute(
+      "SELECT portal_id FROM mikrotiks WHERE id = ?",
+      [mikrotikId]
+    );
+
+    let action = "status";
+    let redirectUrl = "";
+    let logoUrl = "";
+    let corPrimaria = "#3B82F6";
+    let corFundo = "#0f111a";
+
+    // Novas customizações da página de status
+    let statusTitle = "Conectado à Internet";
+    let statusSubtitle = "Sua sessão está ativa e segura";
+    let statusBlur = "8px";
+    let statusCardOpacity = "0.9";
+    let statusCustomCss = "";
+
+    if (mikrotik && mikrotik.portal_id) {
+      const [[portal]] = await db.execute(
+        "SELECT empresa_id, configuracoes FROM portais WHERE id = ?",
+        [mikrotik.portal_id]
+      );
+      if (portal) {
+        if (portal.configuracoes) {
+          try {
+            const cfg = typeof portal.configuracoes === 'string' ? JSON.parse(portal.configuracoes) : portal.configuracoes;
+            action = cfg.post_login_action || "status";
+            redirectUrl = cfg.post_login_redirect_url || "";
+          } catch (e) {}
+        }
+
+        // Buscar a Página de Status dedicada da empresa
+        const [[statusPortal]] = await db.execute(
+          "SELECT logo_url, cor_primaria, cor_fundo, configuracoes FROM portais WHERE empresa_id = ? AND tipo = 'status' LIMIT 1",
+          [portal.empresa_id]
+        );
+        if (statusPortal) {
+          corPrimaria = statusPortal.cor_primaria || "#3B82F6";
+          corFundo = statusPortal.cor_fundo || "#0f111a";
+          logoUrl = statusPortal.logo_url || "";
+          if (statusPortal.configuracoes) {
+            try {
+              const cfg = typeof statusPortal.configuracoes === 'string' ? JSON.parse(statusPortal.configuracoes) : statusPortal.configuracoes;
+              if (cfg.status_title) statusTitle = cfg.status_title;
+              if (cfg.status_subtitle) statusSubtitle = cfg.status_subtitle;
+              if (cfg.status_blur !== undefined) statusBlur = `${cfg.status_blur}px`;
+              if (cfg.status_card_opacity !== undefined) statusCardOpacity = String(cfg.status_card_opacity);
+              if (cfg.status_custom_css) statusCustomCss = cfg.status_custom_css;
+            } catch (e) {}
+          }
+        }
+      }
+    }
+
+    if (action === "redirect" && redirectUrl) {
+      // Normalizar URL (garantir protocolo HTTP/HTTPS)
+      let target = redirectUrl.trim();
+      if (!target.startsWith("http://") && !target.startsWith("https://")) {
+        target = `http://${target}`;
+      }
+      return res.redirect(target);
+    }
+
+    // Renderizar a página de status estilizada de acordo com a identidade visual do portal
+    const html = `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${statusTitle}</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: ${corFundo};
+      background-image: linear-gradient(135deg, ${corFundo} 0%, #060814 100%);
+      color: #e2e8f0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .card {
+      background: rgba(26, 29, 39, ${statusCardOpacity});
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 24px;
+      padding: 36px;
+      max-width: 400px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(${statusBlur});
+    }
+    .logo-area {
+      margin-bottom: 24px;
+    }
+    .logo-img {
+      max-height: 50px;
+      max-width: 200px;
+      object-fit: contain;
+      margin-bottom: 12px;
+    }
+    .logo-fallback {
+      width: 56px;
+      height: 56px;
+      border-radius: 16px;
+      background: ${corPrimaria};
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      font-weight: bold;
+      color: white;
+      margin-bottom: 16px;
+      box-shadow: 0 10px 20px -5px ${corPrimaria}66;
+    }
+    h1 {
+      font-size: 20px;
+      font-weight: 700;
+      color: #fff;
+    }
+    .subtitle {
+      color: #94a3b8;
+      font-size: 13px;
+      margin-top: 4px;
+      margin-bottom: 24px;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(16, 185, 129, 0.15);
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.2);
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .badge-dot {
+      width: 6px;
+      height: 6px;
+      background: #10b981;
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+    .stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin: 24px 0;
+    }
+    .stat {
+      background: rgba(13, 17, 23, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 16px;
+      padding: 16px;
+    }
+    .stat-label {
+      font-size: 10px;
+      color: #64748b;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 6px;
+      font-weight: 600;
+    }
+    .stat-value {
+      font-size: 15px;
+      font-weight: 700;
+      color: #fff;
+      word-break: break-all;
+    }
+    .stat-value.primary {
+      color: ${corPrimaria};
+    }
+    .info-list {
+      background: rgba(13, 17, 23, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.03);
+      border-radius: 16px;
+      padding: 14px 18px;
+      margin-bottom: 24px;
+      text-align: left;
+    }
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      font-size: 12px;
+    }
+    .info-row:last-child {
+      border-bottom: none;
+    }
+    .info-label {
+      color: #64748b;
+    }
+    .info-value {
+      color: #cbd5e1;
+      font-family: monospace;
+      font-weight: 500;
+    }
+    .btn-logout {
+      display: block;
+      width: 100%;
+      padding: 14px;
+      background: #dc2626;
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-decoration: none;
+    }
+    .btn-logout:hover {
+      background: #ef4444;
+      transform: translateY(-1px);
+    }
+    .footer {
+      font-size: 11px;
+      color: #475569;
+    }
+    ${statusCustomCss}
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="logo-area">
+      ${logoUrl ? `<img src="${logoUrl}" alt="Logo" class="logo-img" />` : '<div class="logo-fallback">📶</div>'}
+      <h1>${statusTitle}</h1>
+      <p class="subtitle">${statusSubtitle}</p>
+      <div class="badge">
+        <span class="badge-dot"></span>
+        Dispositivo Autorizado
+      </div>
+    </div>
+
+    <div class="stats">
+      <div class="stat">
+        <div class="stat-label">Tempo Online</div>
+        <div class="stat-value primary">${uptime || '00:00:00'}</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Usuário</div>
+        <div class="stat-value">${username || 'Conectado'}</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Download</div>
+        <div class="stat-value primary">${bytes_out || '0 KB'}</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Upload</div>
+        <div class="stat-value">${bytes_in || '0 KB'}</div>
+      </div>
+    </div>
+
+    <div class="info-list">
+      <div class="info-row">
+        <span class="info-label">Endereço IP</span>
+        <span class="info-value">${ip || '—'}</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Endereço MAC</span>
+        <span class="info-value">${mac || '—'}</span>
+      </div>
+    </div>
+
+    ${link_logout ? `
+    <form action="${link_logout}" method="post">
+      <button type="submit" class="btn-logout">Desconectar da Rede</button>
+    </form>
+    ` : ''}
+    
+    <div style="margin-top: 20px;" class="footer">
+      Powered by Hotspot WiFi &bull; LGPD Compliant
+    </div>
+  </div>
+</body>
+</html>`;
+
+    res.setHeader("Content-Type", "text/html; charset=utf-8");
+    res.setHeader("Cache-Control", "no-cache, no-store");
+    res.send(html);
+
+  } catch (err) {
+    console.error("Erro na rota de status remota:", err);
+    res.redirect(link_orig || "http://google.com");
+  }
+});
+
+// Endpoint público para preview da página de status estilizada do portal
+app.get("/api/hotspot-status/preview/:portalId", async (req, res) => {
+  const { portalId } = req.params;
+
+  try {
+    const [[portal]] = await db.execute(
+      "SELECT configuracoes, logo_url, cor_primaria, cor_fundo FROM portais WHERE id = ?",
+      [portalId]
+    );
+
+    let logoUrl = "";
+    let corPrimaria = "#3B82F6";
+    let corFundo = "#0f111a";
+
+    // Novas customizações da página de status
+    let statusTitle = "Conectado à Internet";
+    let statusSubtitle = "Sua sessão está ativa e segura";
+    let statusBlur = "8px";
+    let statusCardOpacity = "0.9";
+    let statusCustomCss = "";
+
+    if (portal) {
+      corPrimaria = portal.cor_primaria || "#3B82F6";
+      corFundo = portal.cor_fundo || "#0f111a";
+      logoUrl = portal.logo_url || "";
+      if (portal.configuracoes) {
+        try {
+          const cfg = typeof portal.configuracoes === 'string' ? JSON.parse(portal.configuracoes) : portal.configuracoes;
+          if (cfg.status_title) statusTitle = cfg.status_title;
+          if (cfg.status_subtitle) statusSubtitle = cfg.status_subtitle;
+          if (cfg.status_blur !== undefined) statusBlur = `${cfg.status_blur}px`;
+          if (cfg.status_card_opacity !== undefined) statusCardOpacity = String(cfg.status_card_opacity);
+          if (cfg.status_custom_css) statusCustomCss = cfg.status_custom_css;
+        } catch (e) {}
+      }
+    }
+
+    // Dados simulados
+    const uptime = "01:23:45";
+    const bytes_in = "124.5 MB";
+    const bytes_out = "18.2 MB";
+    const username = "visitante_demo";
+    const ip = "192.168.88.254";
+    const mac = "AA:BB:CC:DD:EE:FF";
+
+    const html = `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${statusTitle}</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: ${corFundo};
+      background-image: linear-gradient(135deg, ${corFundo} 0%, #060814 100%);
+      color: #e2e8f0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .card {
+      background: rgba(26, 29, 39, ${statusCardOpacity});
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 24px;
+      padding: 36px;
+      max-width: 400px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(${statusBlur});
+    }
+    .logo-area {
+      margin-bottom: 24px;
+    }
+    .logo-img {
+      max-height: 50px;
+      max-width: 200px;
+      object-fit: contain;
+      margin-bottom: 12px;
+    }
+    .logo-fallback {
+      width: 56px;
+      height: 56px;
+      border-radius: 16px;
+      background: ${corPrimaria};
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      font-weight: bold;
+      color: white;
+      margin-bottom: 16px;
+      box-shadow: 0 10px 20px -5px ${corPrimaria}66;
+    }
+    h1 {
+      font-size: 20px;
+      font-weight: 700;
+      color: #fff;
+    }
+    .subtitle {
+      color: #94a3b8;
+      font-size: 13px;
+      margin-top: 4px;
+      margin-bottom: 24px;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(16, 185, 129, 0.15);
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.2);
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .badge-dot {
+      width: 6px;
+      height: 6px;
+      background: #10b981;
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+    .stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin: 24px 0;
+    }
+    .stat {
+      background: rgba(13, 17, 23, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 16px;
+      padding: 16px;
+    }
+    .stat-label {
+      font-size: 10px;
+      color: #64748b;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 6px;
+      font-weight: 600;
+    }
+    .stat-value {
+      font-size: 15px;
+      font-weight: 700;
+      color: #fff;
+      word-break: break-all;
+    }
+    .stat-value.primary {
+      color: ${corPrimaria};
+    }
+    .info-list {
+      background: rgba(13, 17, 23, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.03);
+      border-radius: 16px;
+      padding: 14px 18px;
+      margin-bottom: 24px;
+      text-align: left;
+    }
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      font-size: 12px;
+    }
+    .info-row:last-child {
+      border-bottom: none;
+    }
+    .info-label {
+      color: #64748b;
+    }
+    .info-value {
+      color: #cbd5e1;
+      font-family: monospace;
+      font-weight: 500;
+    }
+    .btn-logout {
+      display: block;
+      width: 100%;
+      padding: 14px;
+      background: #dc2626;
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-decoration: none;
+      text-align: center;
+    }
+    .btn-logout:hover {
+      background: #ef4444;
+      transform: translateY(-1px);
+    }
+    .footer {
+      font-size: 11px;
+      color: #475569;
+    }
+    ${statusCustomCss}
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="logo-area">
+      ${logoUrl ? `<img src="${logoUrl}" alt="Logo" class="logo-img" />` : '<div class="logo-fallback">📶</div>'}
+      <h1>${statusTitle}</h1>
+      <p class="subtitle">${statusSubtitle}</p>
+      <div class="badge">
+        <span class="badge-dot"></span>
+        Dispositivo Autorizado
+      </div>
+    </div>
+
+    <div class="stats">
+      <div class="stat">
+        <div class="stat-label">Tempo Online</div>
+        <div class="stat-value primary">${uptime}</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Identificação</div>
+        <div class="stat-value">${username}</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Download</div>
+        <div class="stat-value primary">${bytes_out}</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Upload</div>
+        <div class="stat-value">${bytes_in}</div>
+      </div>
+    </div>
+
+    <div class="info-list">
+      <div class="info-row">
+        <span class="info-label">Endereço IP</span>
+        <span class="info-value">${ip}</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Endereço MAC</span>
+        <span class="info-value">${mac}</span>
+      </div>
+    </div>
+
+    <a href="#" class="btn-logout" onclick="alert('Isso é uma simulação de desconexão.'); return false;">Desconectar da Rede</a>
+    
+    <div style="margin-top: 20px;" class="footer">
+      Powered by Hotspot WiFi &bull; LGPD Compliant
+    </div>
+  </div>
+</body>
+</html>`;
+
+    res.setHeader("Content-Type", "text/html; charset=utf-8");
+    res.setHeader("Cache-Control", "no-cache, no-store");
+    res.send(html);
+
+  } catch (err) {
+    console.error("Erro na rota de preview do status:", err);
+    res.status(500).send("<h1>Erro de Carregamento</h1>");
   }
 });
 

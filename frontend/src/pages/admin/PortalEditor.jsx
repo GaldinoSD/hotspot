@@ -60,6 +60,17 @@ const defaultConfigs = {
     cor_botao: "#3b82f6",
     logo_url: "",
   },
+  status: {
+    status_title: "Conectado à Internet",
+    status_subtitle: "Sua sessão está activa e segura",
+    status_blur: 8,
+    status_card_opacity: 0.9,
+    status_custom_css: "",
+    cor_fundo_1: "#0f111a",
+    cor_fundo_2: "#060814",
+    cor_botao: "#3b82f6",
+    logo_url: "",
+  },
 };
 
 const iconPaths = {
@@ -111,8 +122,8 @@ export default function PortalEditor() {
     if (editingField) {
       if (["cor_fundo_1", "cor_fundo_2", "cor_botao", "logo_url"].includes(editingField)) {
         setActiveTab("branding");
-      } else if (["titulo", "subtitulo", "texto_botao", "texto_rodape", "texto_lgpd", "texto_sucesso_titulo", "texto_sucesso_mensagem"].includes(editingField)) {
-        setActiveTab("content");
+      } else if (["titulo", "subtitulo", "texto_botao", "texto_rodape", "texto_lgpd", "texto_sucesso_titulo", "texto_sucesso_mensagem", "status_title", "status_subtitle"].includes(editingField)) {
+        setActiveTab(portal?.tipo === "status" ? "settings" : "content");
       } else if (["campanha_ativa_id", "exibir_cpf", "pagamento_pix_ativo", "pagamento_cartao_ativo", "pix_trial_enabled"].includes(editingField)) {
         setActiveTab("settings");
       }
@@ -402,14 +413,16 @@ export default function PortalEditor() {
             >
               🎨 Aparência
             </button>
-            <button
-              onClick={() => setActiveTab("content")}
-              className={`flex-1 py-2 text-center text-xs font-semibold rounded-lg transition-all cursor-pointer ${
-                activeTab === "content" ? "bg-[#1d212d] text-emerald-400 shadow-sm" : "text-gray-400 hover:text-white"
-              }`}
-            >
-              📝 Textos
-            </button>
+            {portal?.tipo !== "status" && (
+              <button
+                onClick={() => setActiveTab("content")}
+                className={`flex-1 py-2 text-center text-xs font-semibold rounded-lg transition-all cursor-pointer ${
+                  activeTab === "content" ? "bg-[#1d212d] text-emerald-400 shadow-sm" : "text-gray-400 hover:text-white"
+                }`}
+              >
+                📝 Textos
+              </button>
+            )}
             <button
               onClick={() => setActiveTab("settings")}
               className={`flex-1 py-2 text-center text-xs font-semibold rounded-lg transition-all cursor-pointer ${
@@ -418,14 +431,16 @@ export default function PortalEditor() {
             >
               ⚙️ Opções
             </button>
-            <button
-              onClick={() => setActiveTab("whatsapp")}
-              className={`flex-1 py-2 text-center text-xs font-semibold rounded-lg transition-all cursor-pointer ${
-                activeTab === "whatsapp" ? "bg-[#1d212d] text-emerald-400 shadow-sm" : "text-gray-400 hover:text-white"
-              }`}
-            >
-              💬 WhatsApp
-            </button>
+            {portal?.tipo !== "status" && (
+              <button
+                onClick={() => setActiveTab("whatsapp")}
+                className={`flex-1 py-2 text-center text-xs font-semibold rounded-lg transition-all cursor-pointer ${
+                  activeTab === "whatsapp" ? "bg-[#1d212d] text-emerald-400 shadow-sm" : "text-gray-400 hover:text-white"
+                }`}
+              >
+                💬 WhatsApp
+              </button>
+            )}
           </div>
 
           {/* Sidebar Tab Panels */}
@@ -540,6 +555,8 @@ export default function PortalEditor() {
                       />
                     </div>
                   </div>
+
+
                 </div>
               </div>
             )}
@@ -743,7 +760,6 @@ export default function PortalEditor() {
                     )}
                   </div>
                 )}
-
               </div>
             )}
 
@@ -752,139 +768,261 @@ export default function PortalEditor() {
               <div className="space-y-5">
                 <h3 className="text-sm font-semibold text-white mb-2">Opções & Configurações de Fluxo</h3>
 
-                {/* Pre-portal Campaigns */}
-                <div className="bg-[#12141c] p-4 rounded-xl border border-gray-800 space-y-3">
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs">📢</span>
-                    <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Pré-Portal (Campanha Ativa)</span>
-                  </div>
-                  <p className="text-[10px] text-gray-500">Adicione stories ou vídeos publicitários obrigatórios antes da autenticação.</p>
-                  
-                  <select
-                    id="input-campanha_ativa_id"
-                    value={campanhaAtivaId === null ? "" : String(campanhaAtivaId)}
-                    onChange={(e) => salvarCampanha(e.target.value)}
-                    className="w-full bg-[#0d1117] border border-gray-700 text-gray-300 text-xs rounded-lg px-3 py-2.5 focus:ring-1 focus:ring-emerald-500 focus:outline-none"
-                  >
-                    <option value="">— Nenhuma Campanha —</option>
-                    {campanhasDisponiveis.map((c) => (
-                      <option key={c.id} value={String(c.id)}>
-                        {c.nome} ({c.total_itens} {c.total_itens === 1 ? "item" : "itens"})
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                {/* CPF toggler for Lead types */}
-                {["lead", "lead_passivo"].includes(portal.tipo) && (
-                  <div className="bg-[#12141c] p-4 rounded-xl border border-gray-800 flex items-center justify-between">
-                    <div className="space-y-0.5">
-                      <span className="block text-xs font-semibold text-white">Solicitar Campo CPF</span>
-                      <p className="text-[10px] text-gray-500">Exige digitação de CPF para conectar</p>
-                    </div>
-                    <label className="relative inline-flex items-center cursor-pointer shrink-0">
-                      <input
-                        type="checkbox"
-                        id="input-exibir_cpf"
-                        checked={config.exibir_cpf !== false}
-                        onChange={(e) => setConfig({ ...config, exibir_cpf: e.target.checked })}
-                        className="sr-only peer"
-                      />
-                      <div className="w-9 h-5 bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-emerald-500"></div>
-                    </label>
-                  </div>
-                )}
-
-                {/* Plan settings / payment methods */}
-                {portal.tipo === "planos" && (
-                  <div className="space-y-4 bg-[#12141c] p-4 rounded-xl border border-gray-800">
-                    <span className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Métodos de Pagamento Ativos</span>
-                    
-                    {/* Pix Toggle */}
-                    <div className="flex items-center justify-between pb-3 border-b border-gray-850">
-                      <div className="space-y-0.5">
-                        <span className="text-xs font-medium text-white">PIX</span>
-                        <p className="text-[9px] text-gray-500">Liberação via QR Code dinâmico</p>
+                {portal?.tipo === "status" ? (
+                  /* CONFIGURAÇÕES EXCLUSIVAS DA PÁGINA DE STATUS */
+                  <div className="space-y-4">
+                    <div className="bg-[#12141c] p-4 rounded-xl border border-gray-800 space-y-4">
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs">🚀</span>
+                        <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Configurações da Página de Status</span>
                       </div>
-                      <label className="relative inline-flex items-center cursor-pointer">
-                        <input
-                          type="checkbox"
-                          id="input-pagamento_pix_ativo"
-                          checked={config.pagamento_pix_ativo !== false}
-                          onChange={(e) => {
-                            const val = e.target.checked;
-                            if (!val && config.pagamento_cartao_ativo === false) {
-                              alert("Ao menos um método de pagamento precisa estar ativo.");
-                              return;
-                            }
-                            setConfig({ ...config, pagamento_pix_ativo: val });
-                          }}
-                          className="sr-only peer"
-                        />
-                        <div className="w-9 h-5 bg-gray-700 peer-checked:bg-emerald-500 rounded-full peer transition-all after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-4"></div>
-                      </label>
-                    </div>
+                      <p className="text-[10px] text-gray-500">Configure os textos e propriedades visuais do card de status pós-conexão.</p>
 
-                    {/* Card Toggle */}
-                    <div className="flex items-center justify-between pb-3 border-b border-gray-850">
-                      <div className="space-y-0.5">
-                        <span className="text-xs font-medium text-white">Cartão de Crédito</span>
-                        <p className="text-[9px] text-gray-500">Processado via gateway integrado</p>
+                      <div>
+                        <label className="block text-xs text-gray-400 mb-1" htmlFor="input-status_title">Título da Página:</label>
+                        <input
+                          type="text"
+                          id="input-status_title"
+                          value={config.status_title || ""}
+                          onChange={(e) => setConfig({ ...config, status_title: e.target.value })}
+                          placeholder="Padrão: Conectado à Internet"
+                          className="w-full bg-[#0d1117] border border-gray-700 text-white rounded-lg px-3 py-2 text-xs focus:ring-1 focus:ring-emerald-500 focus:outline-none"
+                        />
                       </div>
-                      <label className="relative inline-flex items-center cursor-pointer">
-                        <input
-                          type="checkbox"
-                          id="input-pagamento_cartao_ativo"
-                          checked={config.pagamento_cartao_ativo !== false}
-                          onChange={(e) => {
-                            const val = e.target.checked;
-                            if (!val && config.pagamento_pix_ativo === false) {
-                              alert("Ao menos um método de pagamento precisa estar ativo.");
-                              return;
-                            }
-                            setConfig({ ...config, pagamento_cartao_ativo: val });
-                          }}
-                          className="sr-only peer"
-                        />
-                        <div className="w-9 h-5 bg-gray-700 peer-checked:bg-emerald-500 rounded-full peer transition-all after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-4"></div>
-                      </label>
-                    </div>
 
-                    {/* Temp trial access while paying */}
-                    <div className="pt-2">
-                      <div className="flex items-center justify-between mb-2">
-                        <div className="space-y-0.5">
-                          <span className="text-xs font-medium text-white">Internet Provisória (Trial Pix)</span>
-                          <p className="text-[9px] text-gray-500">Libera acesso temporário para abrir o app do banco</p>
+                      <div>
+                        <label className="block text-xs text-gray-400 mb-1" htmlFor="input-status_subtitle">Subtítulo da Página:</label>
+                        <input
+                          type="text"
+                          id="input-status_subtitle"
+                          value={config.status_subtitle || ""}
+                          onChange={(e) => setConfig({ ...config, status_subtitle: e.target.value })}
+                          placeholder="Padrão: Sua sessão está ativa e segura"
+                          className="w-full bg-[#0d1117] border border-gray-700 text-white rounded-lg px-3 py-2 text-xs focus:ring-1 focus:ring-emerald-500 focus:outline-none"
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <div className="flex justify-between items-center mb-1">
+                            <label className="text-xs text-gray-400" htmlFor="input-status_blur">Desfoque do Fundo:</label>
+                            <span className="text-[10px] text-gray-500">{config.status_blur !== undefined ? config.status_blur : 8}px</span>
+                          </div>
+                          <input
+                            type="range"
+                            id="input-status_blur"
+                            min="0"
+                            max="20"
+                            value={config.status_blur !== undefined ? config.status_blur : 8}
+                            onChange={(e) => setConfig({ ...config, status_blur: parseInt(e.target.value, 10) })}
+                            className="w-full h-1 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-emerald-500"
+                          />
                         </div>
-                        <label className="relative inline-flex items-center cursor-pointer">
+
+                        <div>
+                          <div className="flex justify-between items-center mb-1">
+                            <label className="text-xs text-gray-400" htmlFor="input-status_card_opacity">Opacidade do Painel:</label>
+                            <span className="text-[10px] text-gray-500">{Math.round((config.status_card_opacity !== undefined ? config.status_card_opacity : 0.9) * 100)}%</span>
+                          </div>
+                          <input
+                            type="range"
+                            id="input-status_card_opacity"
+                            min="50"
+                            max="100"
+                            value={(config.status_card_opacity !== undefined ? config.status_card_opacity : 0.9) * 100}
+                            onChange={(e) => setConfig({ ...config, status_card_opacity: parseFloat(e.target.value) / 100 })}
+                            className="w-full h-1 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-emerald-500"
+                          />
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="block text-xs text-gray-400 mb-1" htmlFor="input-status_custom_css">CSS Customizado (Opcional):</label>
+                        <textarea
+                          id="input-status_custom_css"
+                          value={config.status_custom_css || ""}
+                          onChange={(e) => setConfig({ ...config, status_custom_css: e.target.value })}
+                          placeholder="Ex: .card { border-radius: 12px; } #btn-logout { background: blue; }"
+                          rows={4}
+                          className="w-full bg-[#0d1117] border border-gray-700 text-white rounded-lg px-3 py-2 text-xs font-mono focus:ring-1 focus:ring-emerald-500 focus:outline-none resize-y"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  /* CONFIGURAÇÕES DOS PORTAIS DE LOGIN */
+                  <>
+                    {/* Pre-portal Campaigns */}
+                    <div className="bg-[#12141c] p-4 rounded-xl border border-gray-800 space-y-3">
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs">📢</span>
+                        <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Pré-Portal (Campanha Ativa)</span>
+                      </div>
+                      <p className="text-[10px] text-gray-500">Adicione stories ou vídeos publicitários obrigatórios antes da autenticação.</p>
+                      
+                      <select
+                        id="input-campanha_ativa_id"
+                        value={campanhaAtivaId === null ? "" : String(campanhaAtivaId)}
+                        onChange={(e) => salvarCampanha(e.target.value)}
+                        className="w-full bg-[#0d1117] border border-gray-700 text-gray-300 text-xs rounded-lg px-3 py-2.5 focus:ring-1 focus:ring-emerald-500 focus:outline-none"
+                      >
+                        <option value="">— Nenhuma Campanha —</option>
+                        {campanhasDisponiveis.map((c) => (
+                          <option key={c.id} value={String(c.id)}>
+                            {c.nome} ({c.total_itens} {c.total_itens === 1 ? "item" : "itens"})
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    {/* CPF toggler for Lead types */}
+                    {["lead", "lead_passivo"].includes(portal.tipo) && (
+                      <div className="bg-[#12141c] p-4 rounded-xl border border-gray-800 flex items-center justify-between">
+                        <div className="space-y-0.5">
+                          <span className="block text-xs font-semibold text-white">Solicitar Campo CPF</span>
+                          <p className="text-[10px] text-gray-500">Exige digitação de CPF para conectar</p>
+                        </div>
+                        <label className="relative inline-flex items-center cursor-pointer shrink-0">
                           <input
                             type="checkbox"
-                            id="input-pix_trial_enabled"
-                            checked={config.pix_trial_enabled === true}
-                            onChange={(e) => setConfig({ ...config, pix_trial_enabled: e.target.checked })}
+                            id="input-exibir_cpf"
+                            checked={config.exibir_cpf !== false}
+                            onChange={(e) => setConfig({ ...config, exibir_cpf: e.target.checked })}
                             className="sr-only peer"
                           />
-                          <div className="w-9 h-5 bg-gray-700 peer-checked:bg-emerald-500 rounded-full peer transition-all after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-4"></div>
+                          <div className="w-9 h-5 bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-emerald-500"></div>
                         </label>
                       </div>
+                    )}
 
-                      {config.pix_trial_enabled && (
-                        <div className="flex items-center gap-2 pl-1.5 mt-2 bg-[#0d1117] p-2 rounded-lg border border-gray-800">
-                          <label className="text-[10px] text-gray-400">Tempo de liberação:</label>
+                    {/* Plan settings / payment methods */}
+                    {portal.tipo === "planos" && (
+                      <div className="space-y-4 bg-[#12141c] p-4 rounded-xl border border-gray-800">
+                        <span className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Métodos de Pagamento Ativos</span>
+                        
+                        {/* Pix Toggle */}
+                        <div className="flex items-center justify-between pb-3 border-b border-gray-850">
+                          <div className="space-y-0.5">
+                            <span className="text-xs font-medium text-white">PIX</span>
+                            <p className="text-[9px] text-gray-500">Liberação via QR Code dinâmico</p>
+                          </div>
+                          <label className="relative inline-flex items-center cursor-pointer">
+                            <input
+                              type="checkbox"
+                              id="input-pagamento_pix_ativo"
+                              checked={config.pagamento_pix_ativo !== false}
+                              onChange={(e) => {
+                                const val = e.target.checked;
+                                if (!val && config.pagamento_cartao_ativo === false) {
+                                  alert("Ao menos um método de pagamento precisa estar ativo.");
+                                  return;
+                                }
+                                setConfig({ ...config, pagamento_pix_ativo: val });
+                              }}
+                              className="sr-only peer"
+                            />
+                            <div className="w-9 h-5 bg-gray-700 peer-checked:bg-emerald-500 rounded-full peer transition-all after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-4"></div>
+                          </label>
+                        </div>
+
+                        {/* Card Toggle */}
+                        <div className="flex items-center justify-between pb-3 border-b border-gray-850">
+                          <div className="space-y-0.5">
+                            <span className="text-xs font-medium text-white">Cartão de Crédito</span>
+                            <p className="text-[9px] text-gray-500">Processado via gateway integrado</p>
+                          </div>
+                          <label className="relative inline-flex items-center cursor-pointer">
+                            <input
+                              type="checkbox"
+                              id="input-pagamento_cartao_ativo"
+                              checked={config.pagamento_cartao_ativo !== false}
+                              onChange={(e) => {
+                                const val = e.target.checked;
+                                if (!val && config.pagamento_pix_ativo === false) {
+                                  alert("Ao menos um método de pagamento precisa estar ativo.");
+                                  return;
+                                }
+                                setConfig({ ...config, pagamento_cartao_ativo: val });
+                              }}
+                              className="sr-only peer"
+                            />
+                            <div className="w-9 h-5 bg-gray-700 peer-checked:bg-emerald-500 rounded-full peer transition-all after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-4"></div>
+                          </label>
+                        </div>
+
+                        {/* Temp trial access while paying */}
+                        <div className="pt-2">
+                          <div className="flex items-center justify-between mb-2">
+                            <div className="space-y-0.5">
+                              <span className="text-xs font-medium text-white">Internet Provisória (Trial Pix)</span>
+                              <p className="text-[9px] text-gray-500">Libera acesso temporário para abrir o app do banco</p>
+                            </div>
+                            <label className="relative inline-flex items-center cursor-pointer">
+                              <input
+                                type="checkbox"
+                                id="input-pix_trial_enabled"
+                                checked={config.pix_trial_enabled === true}
+                                onChange={(e) => setConfig({ ...config, pix_trial_enabled: e.target.checked })}
+                                className="sr-only peer"
+                              />
+                              <div className="w-9 h-5 bg-gray-700 peer-checked:bg-emerald-500 rounded-full peer transition-all after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-4"></div>
+                            </label>
+                          </div>
+
+                          {config.pix_trial_enabled && (
+                            <div className="flex items-center gap-2 pl-1.5 mt-2 bg-[#0d1117] p-2 rounded-lg border border-gray-800">
+                              <label className="text-[10px] text-gray-400">Tempo de liberação:</label>
+                              <input
+                                type="number"
+                                min="1"
+                                max="30"
+                                value={config.pix_trial_duracao_minutos || 5}
+                                onChange={(e) => setConfig({ ...config, pix_trial_duracao_minutos: parseInt(e.target.value, 10) || 5 })}
+                                className="w-16 bg-[#12141c] border border-gray-700 text-gray-200 text-xs rounded px-2 py-1 focus:ring-1 focus:ring-emerald-500 focus:outline-none"
+                              />
+                              <span className="text-[10px] text-gray-400">minutos</span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Fluxo Pós-Acesso */}
+                    <div className="bg-[#12141c] p-4 rounded-xl border border-gray-800 space-y-4">
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs">🚀</span>
+                        <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Fluxo Pós-Acesso</span>
+                      </div>
+                      <p className="text-[10px] text-gray-500">Escolha o que acontece após o cliente se conectar com sucesso.</p>
+
+                      <div>
+                        <label className="block text-xs text-gray-400 mb-1" htmlFor="input-post_login_action">Ação Pós-Conexão:</label>
+                        <select
+                          id="input-post_login_action"
+                          value={config.post_login_action || "status"}
+                          onChange={(e) => setConfig({ ...config, post_login_action: e.target.value })}
+                          className="w-full bg-[#0d1117] border border-gray-700 text-gray-300 text-xs rounded-lg px-3 py-2.5 focus:ring-1 focus:ring-emerald-500 focus:outline-none cursor-pointer"
+                        >
+                          <option value="status" className="bg-[#121420]">Mostrar Página de Status</option>
+                          <option value="redirect" className="bg-[#121420]">Redirecionar para um Site</option>
+                        </select>
+                      </div>
+
+                      {config.post_login_action === "redirect" && (
+                        <div className="animate-fade-in">
+                          <label className="block text-xs text-gray-400 mb-1" htmlFor="input-post_login_redirect_url">Site para Redirecionamento:</label>
                           <input
-                            type="number"
-                            min="1"
-                            max="30"
-                            value={config.pix_trial_duracao_minutos || 5}
-                            onChange={(e) => setConfig({ ...config, pix_trial_duracao_minutos: parseInt(e.target.value, 10) || 5 })}
-                            className="w-16 bg-[#12141c] border border-gray-700 text-gray-200 text-xs rounded px-2 py-1 focus:ring-1 focus:ring-emerald-500 focus:outline-none"
+                            type="text"
+                            id="input-post_login_redirect_url"
+                            value={config.post_login_redirect_url || ""}
+                            onChange={(e) => setConfig({ ...config, post_login_redirect_url: e.target.value })}
+                            placeholder="Ex: www.suaempresa.com.br"
+                            className="w-full bg-[#0d1117] border border-gray-700 text-white rounded-lg px-3 py-2 text-xs focus:ring-1 focus:ring-emerald-500 focus:outline-none"
                           />
-                          <span className="text-[10px] text-gray-400">minutos</span>
                         </div>
                       )}
                     </div>
-                  </div>
+                  </>
                 )}
               </div>
             )}
@@ -1105,6 +1243,92 @@ export default function PortalEditor() {
 
   // Modular helper to render the simulated portal layout reactively
   function renderPortalPreviewContent() {
+    if (portal?.tipo === "status") {
+      const backgroundGradient = `linear-gradient(135deg, ${config.cor_fundo_1 || "#0f111a"}, ${config.cor_fundo_2 || "#060814"})`;
+      const cardBg = `rgba(26, 29, 39, ${config.status_card_opacity !== undefined ? config.status_card_opacity : 0.9})`;
+      const backdropBlur = `${config.status_blur !== undefined ? config.status_blur : 8}px`;
+
+      return (
+        <div
+          className="min-h-full w-full flex items-center justify-center px-4 py-8 transition-all duration-300 flex-1"
+          style={{ background: backgroundGradient }}
+        >
+          <div 
+            className="w-full max-w-sm rounded-3xl p-6 border border-white/5 text-center shadow-2xl relative"
+            style={{ 
+              backgroundColor: cardBg,
+              backdropFilter: `blur(${backdropBlur})`,
+              WebkitBackdropFilter: `blur(${backdropBlur})`
+            }}
+          >
+            <div className="mb-4">
+              <div
+                className={`group relative inline-block mb-3 cursor-pointer rounded-lg p-1 transition-all ${
+                  editingField === "logo_url" ? "outline outline-2 outline-emerald-500" : "hover:outline hover:outline-2 hover:outline-emerald-500/50"
+                }`}
+                onClick={() => setEditingField("logo_url")}
+              >
+                {config.logo_url ? (
+                  <img src={config.logo_url} alt="Logo" className="max-h-12 mx-auto" />
+                ) : (
+                  <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl text-white text-xl font-bold" style={{ backgroundColor: config.cor_botao || "#3B82F6" }}>
+                    📶
+                  </div>
+                )}
+              </div>
+
+              <div
+                className={`group relative mb-1 py-0.5 px-1 rounded cursor-pointer transition-all ${
+                  editingField === "status_title" ? "outline outline-2 outline-emerald-500" : "hover:outline hover:outline-2 hover:outline-emerald-500/50"
+                }`}
+                onClick={() => setEditingField("status_title")}
+              >
+                <h1 className="text-lg font-bold text-white leading-tight">
+                  {config.status_title || "Conectado à Internet"}
+                </h1>
+              </div>
+
+              <div
+                className={`group relative py-0.5 px-1 rounded cursor-pointer transition-all ${
+                  editingField === "status_subtitle" ? "outline outline-2 outline-emerald-500" : "hover:outline hover:outline-2 hover:outline-emerald-500/50"
+                }`}
+                onClick={() => setEditingField("status_subtitle")}
+              >
+                <p className="text-xs text-gray-400">
+                  {config.status_subtitle || "Sua sessão está ativa e segura"}
+                </p>
+              </div>
+
+              <div className="inline-flex items-center gap-1.5 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-3 py-1 rounded-full text-[10px] font-semibold mt-4">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                Dispositivo Autorizado
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3 my-4">
+              <div className="bg-black/40 border border-white/5 rounded-2xl p-3">
+                <span className="text-[9px] text-gray-500 block uppercase font-semibold">Tempo Online</span>
+                <span className="text-sm font-bold text-white" style={{ color: config.cor_botao || "#3B82F6" }}>01:23:45</span>
+              </div>
+              <div className="bg-black/40 border border-white/5 rounded-2xl p-3">
+                <span className="text-[9px] text-gray-500 block uppercase font-semibold">Identificação</span>
+                <span className="text-sm font-bold text-white">visitante_demo</span>
+              </div>
+            </div>
+
+            <button 
+              className="w-full py-3 bg-red-600 hover:bg-red-500 text-white rounded-xl text-xs font-semibold tracking-wide"
+              onClick={(e) => { e.preventDefault(); alert("Simulação de desconexão."); }}
+            >
+              Desconectar da Rede
+            </button>
+
+            <p className="text-[9px] text-gray-500 mt-4">Powered by Hotspot WiFi</p>
+          </div>
+        </div>
+      );
+    }
+
     const backgroundGradient = `linear-gradient(135deg, ${config.cor_fundo_1 || "#0f111a"}, ${config.cor_fundo_2 || "#0f111a"})`;
     
     return (

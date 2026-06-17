@@ -3,6 +3,24 @@ const { DEFAULT_WHATSAPP_TEMPLATE } = require("../constants/whatsappDefaults");
 
 exports.listarPortais = async (req, res) => {
   try {
+    // Auto-criar portal de status se não existir
+    const [statusPortais] = await db.query("SELECT id FROM portais WHERE empresa_id = ? AND tipo = 'status'", [req.empresa_id]);
+    if (statusPortais.length === 0) {
+      await db.execute(
+        `INSERT INTO portais (empresa_id, nome, slug, tipo, url_redirect, html_content, descricao,
+          cor_primaria, cor_fundo, configuracoes, whatsapp_template)
+         VALUES (?, 'Página de Status', 'status-page', 'status', '/status-page', '', 'Configuração visual e de textos da página de status exibida pós-acesso.',
+          '#3B82F6', '#0f111a', ?, '')`,
+        [req.empresa_id, JSON.stringify({
+          status_title: "Conectado à Internet",
+          status_subtitle: "Sua sessão está ativa e segura",
+          status_blur: 8,
+          status_card_opacity: 0.9,
+          status_custom_css: ""
+        })]
+      );
+    }
+
     const [portais] = await db.query(`
       SELECT p.*,
         pt.nome as template_nome,

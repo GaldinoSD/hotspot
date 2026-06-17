@@ -51,6 +51,7 @@ export default function Portais() {
       planos: { label: "Planos", cls: "bg-green-900/30 text-green-400 border-green-800/50" },
       lead: { label: "Lead", cls: "bg-yellow-900/30 text-yellow-400 border-yellow-800/50" },
       lead_passivo: { label: "Lead (Sem Internet)", cls: "bg-orange-900/30 text-orange-400 border-orange-800/50" },
+      status: { label: "Página de Status", cls: "bg-pink-900/30 text-pink-400 border-pink-800/50" },
       custom: { label: "Custom", cls: "bg-orange-900/30 text-orange-400 border-orange-800/50" },
     };
     const t = map[tipo] || map.custom;
@@ -66,6 +67,9 @@ export default function Portais() {
     );
     if (tipo === "lead" || tipo === "lead_passivo") return (
       <svg className="w-8 h-8 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+    );
+    if (tipo === "status") return (
+      <svg className="w-8 h-8 text-pink-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
     );
     return (
       <svg className="w-8 h-8 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path></svg>
@@ -256,7 +260,7 @@ export default function Portais() {
       {previewPortal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm transition-all duration-300">
           <div className="bg-[#161922] w-full max-w-[90vw] rounded-2xl border border-gray-800 shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
-            {/* Modal Header */}
+              {/* Modal Header */}
             <div className="flex items-center justify-between p-4 border-b border-gray-800 bg-[#1d212d]">
               <div className="flex items-center gap-3">
                 <span className="px-2.5 py-1 bg-emerald-900/30 text-emerald-400 border border-emerald-800/50 rounded font-semibold text-[10px] tracking-wider">PREVIEW</span>
@@ -347,7 +351,11 @@ export default function Portais() {
                   </div>
 
                   <iframe
-                    src={`/api/portais/${previewPortal.id}/preview?token=${encodeURIComponent(token)}`}
+                    src={
+                      previewPortal.tipo === "status"
+                        ? `/api/hotspot-status/preview/${previewPortal.id}`
+                        : `/api/portais/${previewPortal.id}/preview?token=${encodeURIComponent(token)}`
+                    }
                     className="w-full flex-1 border-0 bg-transparent"
                     title="Preview Mobile"
                   />
@@ -381,7 +389,11 @@ export default function Portais() {
                     <div className="w-16"></div>
                   </div>
                   <iframe
-                    src={`/api/portais/${previewPortal.id}/preview?token=${encodeURIComponent(token)}`}
+                    src={
+                      previewPortal.tipo === "status"
+                        ? `/api/hotspot-status/preview/${previewPortal.id}`
+                        : `/api/portais/${previewPortal.id}/preview?token=${encodeURIComponent(token)}`
+                    }
                     className="w-full flex-1 border-0 bg-transparent"
                     title="Preview Desktop"
                   />
