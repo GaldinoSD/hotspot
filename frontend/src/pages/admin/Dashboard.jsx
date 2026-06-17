@@ -52,11 +52,14 @@ export default function Dashboard() {
   const processarHistorico = () => {
     if (!dados || !dados.consumoHistorico) return [];
 
-    // Gerar os últimos 7 dias (incluindo hoje)
+    // Gerar os últimos 7 dias (incluindo hoje) no fuso horário local
     const dias = Array.from({ length: 7 }, (_, i) => {
       const d = new Date();
       d.setDate(d.getDate() - (6 - i));
-      return d.toISOString().split("T")[0];
+      const year = d.getFullYear();
+      const month = String(d.getMonth() + 1).padStart(2, "0");
+      const day = String(d.getDate()).padStart(2, "0");
+      return `${year}-${month}-${day}`;
     });
 
     return dias.map((dia) => {
@@ -85,8 +88,8 @@ export default function Dashboard() {
 
   const chartData = processarHistorico();
   const maxVal = chartData.length > 0 
-    ? Math.max(...chartData.map(d => Math.max(d.download, d.upload)), 1024 * 1024 * 50) 
-    : 1024 * 1024 * 50; // Mínimo 50MB para escala visual
+    ? Math.max(...chartData.map(d => Math.max(d.download, d.upload)), 1024 * 1024) 
+    : 1024 * 1024; // Mínimo 1MB para escala visual
 
   // Configuração do Gráfico SVG
   const width = 600;

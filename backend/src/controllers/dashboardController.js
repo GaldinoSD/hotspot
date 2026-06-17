@@ -26,45 +26,81 @@ exports.getDashboard = async (req, res) => {
       [empresaId]
     );
 
-    // Sessões por Mikrotik via radius_users
+    // Sessões por Mikrotik via radacct (conexões ativas online no momento)
     const [sessoes] = await db.query(`
-      SELECT m.nome, COUNT(r.username) AS conectados
+      SELECT m.nome, COUNT(ra.radacctid) AS conectados
       FROM mikrotiks m
-      LEFT JOIN radius_users r ON r.nas_id = m.id
+      LEFT JOIN radacct ra ON ra.nasipaddress COLLATE utf8mb4_unicode_ci = m.ip COLLATE utf8mb4_unicode_ci AND ra.acctstoptime IS NULL
       WHERE m.empresa_id = ?
       GROUP BY m.id, m.nome
     `, [empresaId]);
 
-    // Consumo acumulado por Mikrotik
+    // Consumo acumulado por Mikrotik (soma de sessões ativas + logs consolidados)
     const [consumoMikrotiks] = await db.query(`
       SELECT 
         m.id,
         m.nome,
         m.ip,
-        COALESCE(SUM(ra.acctinputoctets), 0) AS upload_bytes,
-        COALESCE(SUM(ra.acctoutputoctets), 0) AS download_bytes,
-        COUNT(DISTINCT ra.username) AS total_usuarios_unicos,
-        COUNT(ra.radacctid) AS total_conexoes
+        COALESCE(SUM(combined.upload_bytes), 0) AS upload_bytes,
+        COALESCE(SUM(combined.download_bytes), 0) AS download_bytes,
+        COUNT(DISTINCT combined.username) AS total_usuarios_unicos,
+        COUNT(combined.session_id) AS total_conexoes
       FROM mikrotiks m
-      LEFT JOIN radacct ra ON ra.nasipaddress COLLATE utf8mb4_unicode_ci = m.ip COLLATE utf8mb4_unicode_ci
+      LEFT JOIN (
+        SELECT 
+          nas_ip,
+          bytes_entrada AS upload_bytes,
+          bytes_saida AS download_bytes,
+          username,
+          id AS session_id
+        FROM connection_logs
+        WHERE empresa_id = ?
+
+        UNION ALL
+
+        SELECT 
+          nasipaddress AS nas_ip,
+          acctinputoctets AS upload_bytes,
+          acctoutputoctets AS download_bytes,
+          username,
+          radacctid AS session_id
+        FROM radacct
+        WHERE acctstoptime IS NULL
+      ) combined ON combined.nas_ip COLLATE utf8mb4_unicode_ci = m.ip COLLATE utf8mb4_unicode_ci
       WHERE m.empresa_id = ?
       GROUP BY m.id, m.nome, m.ip
-    `, [empresaId]);
+    `, [empresaId, empresaId]);
 
     // Consumo histórico diário nos últimos 7 dias (agrupado por dia e por Mikrotik)
     const [consumoHistorico] = await db.query(`
-      SELECT 
-        DATE_FORMAT(ra.acctstarttime, '%Y-%m-%d') AS data,
-        m.nome AS mikrotik,
-        COALESCE(SUM(ra.acctinputoctets), 0) AS upload_bytes,
-        COALESCE(SUM(ra.acctoutputoctets), 0) AS download_bytes
-      FROM mikrotiks m
-      INNER JOIN radacct ra ON ra.nasipaddress COLLATE utf8mb4_unicode_ci = m.ip COLLATE utf8mb4_unicode_ci
-      WHERE m.empresa_id = ? 
-        AND ra.acctstarttime >= DATE_SUB(CURDATE(), INTERVAL 6 DAY)
-      GROUP BY DATE_FORMAT(ra.acctstarttime, '%Y-%m-%d'), m.id, m.nome
-      ORDER BY data ASC, m.nome ASC
-    `, [empresaId]);
+      SELECT data, mikrotik, SUM(upload_bytes) AS upload_bytes, SUM(download_bytes) AS download_bytes
+      FROM (
+        SELECT 
+          DATE_FORMAT(cl.inicio_conexao, '%Y-%m-%d') AS data,
+          m.nome AS mikrotik,
+          COALESCE(cl.bytes_entrada, 0) AS upload_bytes,
+          COALESCE(cl.bytes_saida, 0) AS download_bytes
+        FROM mikrotiks m
+        INNER JOIN connection_logs cl ON cl.nas_ip COLLATE utf8mb4_unicode_ci = m.ip COLLATE utf8mb4_unicode_ci
+        WHERE m.empresa_id = ? 
+          AND cl.inicio_conexao >= DATE_SUB(CURDATE(), INTERVAL 6 DAY)
+
+        UNION ALL
+
+        SELECT 
+          DATE_FORMAT(ra.acctstarttime, '%Y-%m-%d') AS data,
+          m.nome AS mikrotik,
+          COALESCE(ra.acctinputoctets, 0) AS upload_bytes,
+          COALESCE(ra.acctoutputoctets, 0) AS download_bytes
+        FROM mikrotiks m
+        INNER JOIN radacct ra ON ra.nasipaddress COLLATE utf8mb4_unicode_ci = m.ip COLLATE utf8mb4_unicode_ci
+        WHERE m.empresa_id = ? 
+          AND ra.acctstarttime >= DATE_SUB(CURDATE(), INTERVAL 6 DAY)
+          AND ra.acctstoptime IS NULL
+      ) combined
+      GROUP BY data, mikrotik
+      ORDER BY data ASC, mikrotik ASC
+    `, [empresaId, empresaId]);
 
     res.json({
       pagamentos: {

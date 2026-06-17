@@ -272,7 +272,14 @@ export default function AdminLayout({ children }) {
                 {(user?.nome || user?.email || '?').substring(0, 2)}
               </div>
               <div className="sidebar-user-details">
-                <div className="sidebar-user-name">{user?.nome || user?.email}</div>
+                <div className="flex items-center gap-1.5 flex-wrap">
+                  <div className="sidebar-user-name">{user?.nome || user?.email}</div>
+                  {user?.role && (
+                    <span className="sidebar-role-badge">
+                      {user.role}
+                    </span>
+                  )}
+                </div>
                 {user?.nome && <div className="sidebar-user-email">{user?.email}</div>}
               </div>
             </div>
@@ -304,29 +311,11 @@ export default function AdminLayout({ children }) {
                 {user?.empresa_nome || 'Empresa'}
               </div>
             )}
-            {user?.role && (
-              <span className="sidebar-role-badge">
-                {user.role}
-              </span>
-            )}
           </div>
         )}
 
         <nav className="flex-1 overflow-y-auto p-4 custom-scrollbar">
           <div className="space-y-1">
-            {isSuperAdmin && (
-              <Link
-                to="/super"
-                title={isCollapsed ? "Painel Super Admin" : ""}
-                className={`flex items-center gap-3 px-4 py-3 rounded-lg font-medium text-yellow-400 hover:bg-yellow-900/20 transition-all duration-200 mb-2 border border-yellow-800/30 ${isCollapsed ? 'justify-center px-0' : ''}`}
-              >
-                <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
-                </svg>
-                {!isCollapsed && <span className="text-sm">Painel Super Admin</span>}
-              </Link>
-            )}
-
             {filteredMenuItems.map((item) => {
               if (item.children) {
                 return (
@@ -401,35 +390,41 @@ export default function AdminLayout({ children }) {
           </div>
         </nav>
 
-        {/* Collapse toggle - bottom of sidebar */}
-        <div className="border-t border-gray-800">
+        {/* Painel Super Admin - fixed bottom */}
+        {isSuperAdmin && (
+          <div className="p-3 border-t border-gray-800/40 bg-[#141720]">
+            <Link
+              to="/super"
+              title={isCollapsed ? "Painel Super Admin" : ""}
+              className={`flex items-center gap-3 px-3 py-2 rounded-lg font-medium text-yellow-400 hover:bg-yellow-950/20 transition-all duration-200 border border-yellow-800/20 ${isCollapsed ? 'justify-center px-0' : ''}`}
+            >
+              <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+              </svg>
+              {!isCollapsed && <span className="text-sm">Painel Super Admin</span>}
+            </Link>
+          </div>
+        )}
+
+        {/* Unified bottom bar - Collapse toggle & Credits */}
+        <div className={`border-t border-gray-800/40 p-2.5 flex items-center ${isCollapsed ? 'justify-center' : 'justify-between'} gap-2 bg-[#12151e]`}>
+          {!isCollapsed && (
+            <span className="text-[10px] text-gray-500 truncate">
+              Desenvolvido por <span className="font-semibold text-gray-400">Jonatas A. Galdino</span>
+            </span>
+          )}
           <button
             onClick={() => setIsCollapsed(!isCollapsed)}
-            className={`hidden lg:flex w-full items-center gap-3 px-4 py-3 text-gray-400 hover:bg-[#252b3b] hover:text-gray-200 transition-all duration-200 cursor-pointer ${isCollapsed ? 'justify-center px-0' : ''}`}
-            title={isCollapsed ? 'Expandir sidebar' : 'Recolher sidebar'}
+            className="hidden lg:flex items-center justify-center p-1 rounded-md text-gray-500 hover:bg-gray-800 hover:text-gray-300 transition-all duration-200 cursor-pointer"
+            title={isCollapsed ? 'Expandir menu' : 'Recolher menu'}
           >
-            <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               {isCollapsed
-                ? <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 5l7 7-7 7M5 5l7 7-7 7"/>
-                : <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"/>
+                ? <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"/>
+                : <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7"/>
               }
             </svg>
-            {!isCollapsed && <span className="text-sm font-medium">Recolher menu</span>}
           </button>
-        </div>
-
-        {/* Footer credits */}
-        <div className="p-4 border-t border-gray-800">
-          <div className="text-center text-xs text-gray-600">
-            {!isCollapsed ? (
-              <>
-                Desenvolvido por<br/>
-                <span className="font-semibold text-gray-400">Jonatas A. Galdino</span>
-              </>
-            ) : (
-              <span className="font-bold text-gray-400 text-[10px]">JAG</span>
-            )}
-          </div>
         </div>
       </aside>
 
