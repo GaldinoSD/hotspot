@@ -64,24 +64,21 @@ function EmpresasModal({ open, onClose }) {
   const filtered = empresas.filter(e =>
     !searchTerm ||
     e.nome?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    e.slug?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    e.email?.toLowerCase().includes(searchTerm.toLowerCase())
+    e.slug?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  if (!open) return null;
-
   return (
-    <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-[#1a1d27] rounded-2xl border border-gray-700 w-full max-w-4xl max-h-[85vh] flex flex-col shadow-2xl">
+    <div className="modal-overlay">
+      <div className="modal-container max-w-4xl">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-800 flex-shrink-0">
-          <div className="flex items-center gap-3">
+        <div className="modal-header">
+          <div className="modal-title">
             <div className="w-9 h-9 rounded-xl bg-emerald-500/15 border border-emerald-800/30 flex items-center justify-center">
               <Building2 className="w-4 h-4 text-emerald-400" />
             </div>
             <div>
-              <h3 className="text-base font-bold text-white">Gerenciar Empresas</h3>
-              <p className="text-[10px] text-gray-500">{empresas.length} empresa(s) cadastrada(s)</p>
+              <h3 className="text-sm font-bold text-white leading-none">Gerenciar Empresas</h3>
+              <p className="text-[10px] text-gray-500 mt-1">{empresas.length} empresa(s) cadastrada(s)</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
@@ -91,7 +88,7 @@ function EmpresasModal({ open, onClose }) {
             >
               <Plus className="w-3 h-3" /> Nova Empresa
             </button>
-            <button onClick={onClose} className="p-2 text-gray-400 hover:text-white hover:bg-gray-800 rounded-xl transition-all"><X className="w-4 h-4" /></button>
+            <button onClick={onClose} className="modal-close-btn" title="Fechar"><X className="w-5 h-5" /></button>
           </div>
         </div>
 
@@ -102,13 +99,13 @@ function EmpresasModal({ open, onClose }) {
             <input
               type="text" placeholder="Buscar empresa..."
               value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full bg-[#0d1117] border border-gray-800 focus:border-blue-500 text-white rounded-lg pl-9 pr-3 py-2 text-xs focus:outline-none transition-all placeholder-gray-600"
+              className="w-full bg-[#151724] border border-[#323652] focus:border-blue-500 text-white rounded-xl pl-9 pr-3 py-2 text-xs focus:outline-none transition-all placeholder-gray-600"
             />
           </div>
         </div>
 
         {/* Body */}
-        <div className="flex-1 overflow-y-auto px-6 py-4 space-y-3 custom-scrollbar">
+        <div className="modal-body space-y-3">
           {loading ? (
             <div className="flex items-center justify-center py-12">
               <div className="w-7 h-7 border-3 border-gray-700 border-t-blue-500 rounded-full animate-spin" style={{borderWidth:'3px'}}></div>
@@ -117,7 +114,7 @@ function EmpresasModal({ open, onClose }) {
           ) : filtered.length === 0 ? (
             <div className="text-center py-10"><Building2 className="w-8 h-8 text-gray-700 mx-auto mb-2"/><p className="text-gray-500 text-sm">Nenhuma empresa encontrada.</p></div>
           ) : filtered.map((e) => (
-            <div key={e.id} className="bg-[#0d1117] border border-gray-800 rounded-xl p-4 hover:border-gray-700/80 transition-all">
+            <div key={e.id} className="bg-[#151724] border border-[#323652] rounded-xl p-4 hover:border-gray-700/80 transition-all">
               <div className="flex items-start justify-between gap-3">
                 <div className="flex items-start gap-3 flex-1 min-w-0">
                   <div className="w-9 h-9 rounded-lg bg-blue-600/15 border border-blue-800/30 flex items-center justify-center flex-shrink-0">
@@ -126,7 +123,7 @@ function EmpresasModal({ open, onClose }) {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
                       <h4 className="text-sm font-bold text-white truncate">{e.nome}</h4>
-                      <span className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[8px] font-bold border ${e.ativo ? 'bg-emerald-950/40 text-emerald-400 border-emerald-800/40' : 'bg-red-950/40 text-red-400 border-red-800/40'}`}>
+                      <span className={`inline-flex items-center gap-1.5 px-1.5 py-0.5 rounded-full text-[8px] font-bold border ${e.ativo ? 'bg-emerald-950/40 text-emerald-400 border-emerald-800/40' : 'bg-red-955/40 text-red-400 border-red-900/30'}`}>
                         <span className={`w-1 h-1 rounded-full ${e.ativo ? 'bg-emerald-400' : 'bg-red-400'}`}></span>
                         {e.ativo ? 'Ativo' : 'Inativo'}
                       </span>
@@ -166,41 +163,43 @@ function EmpresasModal({ open, onClose }) {
 
         {/* Form Sub-Modal */}
         {showForm && (
-          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[60] p-4">
-            <div className="bg-[#1a1d27] rounded-2xl border border-gray-700 w-full max-w-md p-6 shadow-2xl">
-              <div className="flex justify-between items-center mb-5 pb-2 border-b border-gray-800">
-                <h3 className="text-base font-bold text-white flex items-center gap-2">
-                  <Building2 className="w-4 h-4 text-emerald-400" />
+          <div className="modal-overlay z-[60]">
+            <div className="modal-container max-w-md">
+              <div className="modal-header">
+                <h3 className="modal-title">
+                  <Building2 className="w-5 h-5 text-emerald-400" />
                   {editId ? "Editar Empresa" : "Nova Empresa"}
                 </h3>
-                <button onClick={() => setShowForm(false)} className="text-gray-400 hover:text-white transition-colors"><X className="w-4 h-4"/></button>
+                <button onClick={() => setShowForm(false)} className="modal-close-btn" title="Fechar"><X className="w-5 h-5"/></button>
               </div>
-              <form onSubmit={handleSubmit} className="space-y-3">
-                <div>
-                  <label className="block text-[10px] text-gray-400 mb-1 font-bold uppercase tracking-wider">Nome</label>
-                  <input type="text" required placeholder="Ex: Empresa ABC" value={form.nome} onChange={(e) => setForm({...form, nome: e.target.value})}
-                    className="w-full bg-[#0d1117] border border-gray-800 focus:border-blue-500 text-white rounded-xl px-3 py-2.5 text-sm focus:outline-none transition-all" />
-                </div>
-                <div>
-                  <label className="block text-[10px] text-gray-400 mb-1 font-bold uppercase tracking-wider">Email</label>
-                  <input type="email" required placeholder="contato@empresa.com" value={form.email} onChange={(e) => setForm({...form, email: e.target.value})}
-                    className="w-full bg-[#0d1117] border border-gray-800 focus:border-blue-500 text-white rounded-xl px-3 py-2.5 text-sm focus:outline-none transition-all" />
-                </div>
-                <div className="grid grid-cols-2 gap-3">
+              <form onSubmit={handleSubmit} className="flex flex-col flex-1 overflow-hidden">
+                <div className="modal-body space-y-4">
                   <div>
-                    <label className="block text-[10px] text-gray-400 mb-1 font-bold uppercase tracking-wider">CNPJ</label>
-                    <input type="text" placeholder="00.000.000/0000-00" value={form.cnpj} onChange={(e) => setForm({...form, cnpj: e.target.value})}
-                      className="w-full bg-[#0d1117] border border-gray-800 focus:border-blue-500 text-white rounded-xl px-3 py-2.5 text-sm focus:outline-none transition-all font-mono" />
+                    <label className="block text-[10px] text-gray-400 mb-2 font-bold uppercase tracking-wider">Nome</label>
+                    <input type="text" required placeholder="Ex: Empresa ABC" value={form.nome} onChange={(e) => setForm({...form, nome: e.target.value})}
+                      className="w-full px-4 py-2.5 text-white rounded-xl focus:outline-none text-xs transition-all" />
                   </div>
                   <div>
-                    <label className="block text-[10px] text-gray-400 mb-1 font-bold uppercase tracking-wider">Telefone</label>
-                    <input type="text" placeholder="(00) 00000-0000" value={form.telefone} onChange={(e) => setForm({...form, telefone: e.target.value})}
-                      className="w-full bg-[#0d1117] border border-gray-800 focus:border-blue-500 text-white rounded-xl px-3 py-2.5 text-sm focus:outline-none transition-all" />
+                    <label className="block text-[10px] text-gray-400 mb-2 font-bold uppercase tracking-wider">Email</label>
+                    <input type="email" required placeholder="contato@empresa.com" value={form.email} onChange={(e) => setForm({...form, email: e.target.value})}
+                      className="w-full px-4 py-2.5 text-white rounded-xl focus:outline-none text-xs transition-all" />
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-[10px] text-gray-400 mb-2 font-bold uppercase tracking-wider">CNPJ</label>
+                      <input type="text" placeholder="00.000.000/0000-00" value={form.cnpj} onChange={(e) => setForm({...form, cnpj: e.target.value})}
+                        className="w-full px-4 py-2.5 text-white rounded-xl focus:outline-none text-xs transition-all font-mono" />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] text-gray-400 mb-2 font-bold uppercase tracking-wider">Telefone</label>
+                      <input type="text" placeholder="(00) 00000-0000" value={form.telefone} onChange={(e) => setForm({...form, telefone: e.target.value})}
+                        className="w-full px-4 py-2.5 text-white rounded-xl focus:outline-none text-xs transition-all" />
+                    </div>
                   </div>
                 </div>
-                <div className="flex justify-end gap-2 pt-3 border-t border-gray-800/80">
-                  <button type="button" onClick={() => setShowForm(false)} className="px-4 py-2 border border-gray-800 hover:bg-[#151821] text-gray-300 rounded-xl text-xs font-semibold uppercase tracking-wider transition-all cursor-pointer">Cancelar</button>
-                  <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-500 text-xs font-bold uppercase tracking-wider transition-all shadow-md cursor-pointer">{editId ? "Salvar" : "Criar"}</button>
+                <div className="modal-footer">
+                  <button type="button" onClick={() => setShowForm(false)} className="px-4 py-2 bg-transparent hover:bg-gray-900 border border-gray-800 text-gray-300 text-xs font-semibold rounded-xl transition-colors cursor-pointer">Cancelar</button>
+                  <button type="submit" className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-semibold text-xs py-2 px-4 rounded-xl shadow-lg hover:shadow-xl transition-all cursor-pointer">{editId ? "Salvar" : "Criar"}</button>
                 </div>
               </form>
             </div>
@@ -268,20 +267,15 @@ function BackupsModal({ open, onClose }) {
     finally { setActionLoading(false); }
   };
 
-  const formatDate = (d) => { if (!d) return "—"; try { return new Date(d).toLocaleString("pt-BR"); } catch { return d; } };
-  const hasFiles = (b) => b.db_exists !== false && b.files_exists !== false;
-
-  if (!open) return null;
-
   return (
-    <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-[#1a1d27] rounded-2xl border border-gray-700 w-full max-w-4xl max-h-[85vh] flex flex-col shadow-2xl">
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-800 flex-shrink-0">
-          <div className="flex items-center gap-3">
+    <div className="modal-overlay">
+      <div className="modal-container max-w-4xl">
+        <div className="modal-header">
+          <div className="modal-title">
             <div className="w-9 h-9 rounded-xl bg-amber-500/15 border border-amber-800/30 flex items-center justify-center"><Database className="w-4 h-4 text-amber-400" /></div>
             <div>
-              <h3 className="text-base font-bold text-white">Backups do Sistema</h3>
-              <p className="text-[10px] text-gray-500">Gerencie backups de banco e arquivos</p>
+              <h3 className="text-sm font-bold text-white leading-none">Backups do Sistema</h3>
+              <p className="text-[10px] text-gray-500 mt-1">Gerencie backups de banco e arquivos</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
@@ -289,13 +283,13 @@ function BackupsModal({ open, onClose }) {
               className="inline-flex items-center gap-1.5 px-3 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-[10px] font-bold uppercase tracking-wider transition-all disabled:opacity-50 cursor-pointer">
               <Plus className="w-3 h-3" /> {actionLoading ? "Aguarde..." : "Criar Backup"}
             </button>
-            <button onClick={onClose} className="p-2 text-gray-400 hover:text-white hover:bg-gray-800 rounded-xl transition-all"><X className="w-4 h-4" /></button>
+            <button onClick={onClose} className="modal-close-btn" title="Fechar"><X className="w-5 h-5" /></button>
           </div>
         </div>
 
-        <div className="flex-1 overflow-y-auto px-6 py-4 space-y-4 custom-scrollbar">
+        <div className="modal-body space-y-4">
           {message && (
-            <div className={`rounded-xl p-3 border flex items-center gap-2 text-xs ${message.type === "success" ? "bg-emerald-950/20 border-emerald-800/40 text-emerald-400" : "bg-red-950/20 border-red-800/40 text-red-400"}`}>
+            <div className={`rounded-xl p-3 border flex items-center gap-2 text-xs ${message.type === "success" ? "bg-emerald-950/20 border-emerald-800/40 text-emerald-400" : "bg-red-955/20 border-red-800/30 text-red-400"}`}>
               {message.type === "success" ? <CheckCircle2 className="w-3.5 h-3.5 flex-shrink-0" /> : <AlertCircle className="w-3.5 h-3.5 flex-shrink-0" />}
               {message.text}
             </div>
@@ -309,16 +303,16 @@ function BackupsModal({ open, onClose }) {
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead className="bg-[#11141e]">
-                  <tr className="border-b border-gray-800">
-                    <th className="px-4 py-3 text-left text-[10px] font-bold text-gray-400 uppercase tracking-wider">Tipo</th>
-                    <th className="px-4 py-3 text-left text-[10px] font-bold text-gray-400 uppercase tracking-wider">Update</th>
-                    <th className="px-4 py-3 text-left text-[10px] font-bold text-gray-400 uppercase tracking-wider">Data</th>
-                    <th className="px-4 py-3 text-center text-[10px] font-bold text-gray-400 uppercase tracking-wider">DB</th>
-                    <th className="px-4 py-3 text-center text-[10px] font-bold text-gray-400 uppercase tracking-wider">Arquivos</th>
-                    <th className="px-4 py-3 text-right text-[10px] font-bold text-gray-400 uppercase tracking-wider">Ações</th>
+                  <tr className="border-b border-gray-800 text-gray-400">
+                    <th className="px-4 py-3 text-left text-[10px] font-bold uppercase tracking-wider">Tipo</th>
+                    <th className="px-4 py-3 text-left text-[10px] font-bold uppercase tracking-wider">Update</th>
+                    <th className="px-4 py-3 text-left text-[10px] font-bold uppercase tracking-wider">Data</th>
+                    <th className="px-4 py-3 text-center text-[10px] font-bold uppercase tracking-wider">DB</th>
+                    <th className="px-4 py-3 text-center text-[10px] font-bold uppercase tracking-wider">Arquivos</th>
+                    <th className="px-4 py-3 text-right text-[10px] font-bold uppercase tracking-wider">Ações</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-800/60">
+                <tbody className="divide-y divide-gray-800/60 text-gray-350">
                   {backups.map((b) => {
                     const tipo = b.tipo || b.type;
                     const isPre = tipo === "pre_update" || tipo === "pre-atualizacao" || tipo === "pre_atualizacao";
@@ -330,7 +324,7 @@ function BackupsModal({ open, onClose }) {
                             {isPre ? <><RotateCcw className="w-2.5 h-2.5"/>Pré-Atualização</> : <><HardDrive className="w-2.5 h-2.5"/>Manual</>}
                           </span>
                         </td>
-                        <td className="px-4 py-3 text-[10px] text-gray-500 font-mono">{b.update_id || "—"}</td>
+                        <td className="px-4 py-3 text-[10px] text-gray-550 font-mono">{b.update_id || "—"}</td>
                         <td className="px-4 py-3 text-[10px] text-gray-400 flex items-center gap-1"><Clock className="w-2.5 h-2.5 text-gray-600"/>{formatDate(b.criado_em || b.created_at || b.date)}</td>
                         <td className="px-4 py-3 text-center">
                           <span className={`inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full text-[9px] font-bold border ${b.db_exists !== false ? 'bg-emerald-950/40 text-emerald-400 border-emerald-800/40' : 'bg-red-950/40 text-red-400 border-red-800/40'}`}>
@@ -359,11 +353,11 @@ function BackupsModal({ open, onClose }) {
           )}
 
           {/* Emergency */}
-          <div className="bg-[#0d1117] border border-amber-900/25 rounded-xl p-4 flex items-start gap-3">
+          <div className="bg-[#151724] border border-amber-900/40 rounded-xl p-4 flex items-start gap-3">
             <AlertTriangle className="w-4 h-4 text-amber-400 flex-shrink-0 mt-0.5" />
             <div>
-              <p className="text-amber-400 font-bold text-xs mb-1">Acesso de Emergência</p>
-              <code className="text-[10px] text-amber-300 font-mono bg-black/40 px-2 py-1 rounded">http://servidor:3001/emergency</code>
+              <p className="text-amber-450 font-bold text-xs mb-1">Acesso de Emergência</p>
+              <code className="text-[10px] text-amber-300 font-mono bg-black/45 px-2.5 py-1 rounded-lg">http://servidor:3001/emergency</code>
             </div>
           </div>
         </div>
@@ -453,27 +447,27 @@ function AtualizarModal({ open, onClose }) {
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-[#1a1d27] rounded-2xl border border-gray-700 w-full max-w-xl max-h-[85vh] flex flex-col shadow-2xl">
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-800 flex-shrink-0">
-          <div className="flex items-center gap-3">
+    <div className="modal-overlay">
+      <div className="modal-container max-w-xl">
+        <div className="modal-header">
+          <div className="modal-title">
             <div className="w-9 h-9 rounded-xl bg-blue-500/15 border border-blue-800/30 flex items-center justify-center"><RefreshCw className="w-4 h-4 text-blue-400" /></div>
             <div>
-              <h3 className="text-base font-bold text-white">Atualizar Sistema</h3>
-              <p className="text-[10px] text-gray-500">Verifique e aplique atualizações</p>
+              <h3 className="text-sm font-bold text-white leading-none">Atualizar Sistema</h3>
+              <p className="text-[10px] text-gray-500 mt-1">Verifique e aplique atualizações</p>
             </div>
           </div>
-          <button onClick={onClose} className="p-2 text-gray-400 hover:text-white hover:bg-gray-800 rounded-xl transition-all"><X className="w-4 h-4" /></button>
+          <button onClick={onClose} className="modal-close-btn" title="Fechar"><X className="w-5 h-5" /></button>
         </div>
 
-        <div className="flex-1 overflow-y-auto px-6 py-5 custom-scrollbar">
+        <div className="modal-body space-y-4">
           {step === "email" && (
             <form onSubmit={handleCheck} className="space-y-4">
-              <p className="text-sm text-gray-400">Informe o email Hotmart para validar sua assinatura.</p>
+              <p className="text-xs text-gray-400 leading-relaxed">Informe o email Hotmart para validar sua assinatura.</p>
               <div>
-                <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1.5">Email Hotmart</label>
+                <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">Email Hotmart</label>
                 <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="seu@email.com" required
-                  className="w-full bg-[#0d1117] border border-gray-800 focus:border-blue-500 rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:outline-none text-sm" />
+                  className="w-full bg-[#151724] border border-[#323652] focus:border-blue-500 rounded-xl px-4 py-2.5 text-white placeholder-gray-600 focus:outline-none text-xs transition-all" />
               </div>
               <button type="submit" className="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-xl text-xs uppercase tracking-wider shadow-md cursor-pointer">Verificar Atualizações</button>
             </form>
@@ -482,7 +476,7 @@ function AtualizarModal({ open, onClose }) {
           {step === "checking" && (
             <div className="flex flex-col items-center py-10 gap-4">
               <div className="w-14 h-14 border-4 border-gray-700 border-t-blue-500 rounded-full animate-spin"></div>
-              <div className="text-center"><p className="text-white font-bold">Verificando...</p><p className="text-gray-500 text-sm">Validando assinatura</p></div>
+              <div className="text-center"><p className="text-white font-bold">Verificando...</p><p className="text-gray-500 text-sm mt-0.5">Validando assinatura</p></div>
             </div>
           )}
 
@@ -492,7 +486,7 @@ function AtualizarModal({ open, onClose }) {
                 <Database className="w-3.5 h-3.5 text-blue-400 flex-shrink-0 mt-0.5" />
                 <p className="text-blue-300 text-xs">Um backup automático será criado antes de aplicar.</p>
               </div>
-              <div className="bg-[#0d1117] border border-gray-800 rounded-xl divide-y divide-gray-800/60">
+              <div className="bg-[#151724] border border-[#323652] rounded-xl divide-y divide-[#323652]/60">
                 <div className="px-4 py-3 flex items-center gap-2"><RefreshCw className="w-3.5 h-3.5 text-blue-400"/><span className="text-white font-bold text-xs">{updates.length} atualização(ões)</span></div>
                 {updates.map((u, idx) => (
                   <div key={u.id} className="px-4 py-3 flex items-start justify-between gap-3">
@@ -553,25 +547,43 @@ function AtualizarModal({ open, onClose }) {
         </div>
       </div>
 
-      {/* Logs sub-modal */}
       {logsOpen && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 p-4" onClick={() => setLogsOpen(false)}>
-          <div className="bg-[#1a1d27] border border-gray-700 rounded-2xl p-5 max-w-2xl w-full max-h-[75vh] flex flex-col shadow-2xl" onClick={e => e.stopPropagation()}>
-            <div className="flex items-center justify-between mb-3 pb-2 border-b border-gray-800">
-              <h3 className="text-white font-bold text-sm flex items-center gap-2"><FileText className="w-4 h-4 text-blue-400"/>Logs {lastAppliedId && <span className="text-[10px] text-gray-500 font-mono">#{lastAppliedId}</span>}</h3>
-              <button onClick={() => setLogsOpen(false)} className="text-gray-500 hover:text-gray-300"><X className="w-4 h-4"/></button>
+        <div className="modal-overlay z-[60]" onClick={() => setLogsOpen(false)}>
+          <div className="modal-container max-w-2xl" onClick={e => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3 className="modal-title">
+                <FileText className="w-4 h-4 text-blue-400" />
+                Logs {lastAppliedId && <span className="text-[10px] text-gray-500 font-mono bg-gray-900 border border-gray-800 px-2 py-0.5 rounded">#{lastAppliedId}</span>}
+              </h3>
+              <button onClick={() => setLogsOpen(false)} className="modal-close-btn" title="Fechar"><X className="w-5 h-5"/></button>
             </div>
-            <div className="flex-1 overflow-y-auto bg-[#0d1117] border border-gray-800 rounded-xl p-3 font-mono text-[10px]">
-              {logsLoading ? <div className="flex items-center gap-2 text-gray-500"><Loader2 className="w-3.5 h-3.5 animate-spin"/>Carregando...</div> :
-               logsData.length === 0 ? <p className="text-gray-500">Nenhum log encontrado.</p> :
-               <div className="space-y-1">{logsData.map(l => {
-                 const c = l.status === "erro" ? "text-red-400" : l.status === "ok" ? "text-emerald-400" : "text-blue-400";
-                 return <div key={l.id} className="flex gap-2"><span className="text-gray-600 shrink-0">{new Date(l.criado_em).toLocaleTimeString("pt-BR")}</span><span className={`shrink-0 w-12 ${c}`}>[{l.status}]</span><span className="text-gray-300 break-all">{l.message}</span></div>;
-               })}</div>}
+            
+            <div className="modal-body space-y-4">
+              <div className="bg-[#151724] border border-[#323652] rounded-xl p-3 font-mono text-[10px] leading-relaxed max-h-[40vh] overflow-y-auto custom-scrollbar">
+                {logsLoading ? (
+                  <div className="flex items-center gap-2 text-gray-500"><Loader2 className="w-3.5 h-3.5 animate-spin"/>Carregando...</div>
+                ) : logsData.length === 0 ? (
+                  <p className="text-gray-500 italic">Nenhum log encontrado.</p>
+                ) : (
+                  <div className="space-y-1">
+                    {logsData.map(l => {
+                      const c = l.status === "erro" ? "text-red-400 font-semibold" : l.status === "ok" ? "text-emerald-400" : "text-blue-400";
+                      return (
+                        <div key={l.id} className="flex gap-2">
+                          <span className="text-gray-600 shrink-0">{new Date(l.criado_em).toLocaleTimeString("pt-BR")}</span>
+                          <span className={`shrink-0 w-12 ${c}`}>[{l.status}]</span>
+                          <span className="text-gray-300 break-all">{l.message}</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
             </div>
-            <div className="mt-3 flex justify-end gap-2">
-              <button onClick={() => fetchLogs(lastAppliedId)} className="px-3 py-1.5 bg-blue-600/15 text-blue-300 rounded-lg text-[10px] font-bold uppercase border border-blue-800/30 cursor-pointer">Recarregar</button>
-              <button onClick={() => setLogsOpen(false)} className="px-3 py-1.5 bg-gray-800 text-gray-300 rounded-lg text-[10px] font-bold uppercase border border-gray-700 cursor-pointer">Fechar</button>
+            
+            <div className="modal-footer">
+              <button onClick={() => fetchLogs(lastAppliedId)} className="px-4 py-2 bg-transparent hover:bg-gray-900 border border-gray-800 text-blue-450 text-xs font-semibold rounded-xl transition-all cursor-pointer">Recarregar</button>
+              <button onClick={() => setLogsOpen(false)} className="px-4 py-2 bg-transparent hover:bg-gray-950 border border-gray-850 text-gray-300 text-xs font-semibold rounded-xl transition-colors cursor-pointer">Fechar</button>
             </div>
           </div>
         </div>
@@ -584,14 +596,26 @@ function AtualizarModal({ open, onClose }) {
 function PublicarModal({ open, onClose }) {
   if (!open) return null;
   return (
-    <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-[#1a1d27] rounded-2xl border border-gray-700 w-full max-w-md p-8 shadow-2xl text-center">
-        <div className="w-12 h-12 rounded-xl bg-cyan-500/15 border border-cyan-800/30 flex items-center justify-center mx-auto mb-4">
-          <Upload className="w-6 h-6 text-cyan-400" />
+    <div className="modal-overlay">
+      <div className="modal-container max-w-md">
+        <div className="modal-header">
+          <h3 className="modal-title">
+            <Upload className="w-5 h-5 text-cyan-400" />
+            Publicar Atualização
+          </h3>
+          <button onClick={onClose} className="modal-close-btn" title="Fechar"><X className="w-5 h-5" /></button>
         </div>
-        <h3 className="text-lg font-bold text-white mb-2">Publicar Atualização</h3>
-        <p className="text-gray-500 text-sm mb-6">Este módulo está temporariamente desabilitado.</p>
-        <button onClick={onClose} className="px-5 py-2.5 bg-gray-800 hover:bg-gray-700 text-gray-300 rounded-xl text-xs font-bold uppercase tracking-wider border border-gray-700 cursor-pointer">Fechar</button>
+        
+        <div className="modal-body space-y-4 text-center py-8">
+          <div className="w-12 h-12 rounded-xl bg-cyan-500/10 border border-cyan-800/20 flex items-center justify-center mx-auto mb-2 animate-pulse">
+            <Upload className="w-6 h-6 text-cyan-400" />
+          </div>
+          <p className="text-gray-400 text-sm">Este módulo está temporariamente desabilitado.</p>
+        </div>
+
+        <div className="modal-footer">
+          <button onClick={onClose} className="px-4 py-2 bg-transparent hover:bg-gray-900 border border-gray-800 text-gray-300 text-xs font-semibold rounded-xl transition-colors cursor-pointer">Fechar</button>
+        </div>
       </div>
     </div>
   );
@@ -603,6 +627,11 @@ export default function SuperDashboard() {
   const navigate = useNavigate();
   const [empresas, setEmpresas] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    localStorage.removeItem("theme");
+    document.documentElement.classList.remove("theme-light");
+  }, []);
 
   // Modal states
   const [showEmpresas, setShowEmpresas] = useState(false);

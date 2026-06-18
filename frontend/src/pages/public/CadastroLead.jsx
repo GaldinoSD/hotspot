@@ -80,7 +80,7 @@ export default function CadastroLead() {
       setMensagem("Conectando à internet...");
 
       if (data.gateway && data.username) {
-        redirecionarHotspot(data.gateway, data.username, data.password, 1500);
+        redirecionarHotspot(data.gateway, data.username, data.password, 1500, { cfg, mac: form.mac, ip: form.ip, mikrotikId });
       }
     } catch (err) {
       setErro(err.message);

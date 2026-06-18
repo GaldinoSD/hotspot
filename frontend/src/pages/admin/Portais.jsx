@@ -45,6 +45,17 @@ export default function Portais() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const getConfigObj = (portalItem) => {
+    if (!portalItem.configuracoes) return {};
+    try {
+      return typeof portalItem.configuracoes === "string" 
+        ? JSON.parse(portalItem.configuracoes) 
+        : portalItem.configuracoes;
+    } catch {
+      return {};
+    }
+  };
+
   const tipoBadge = (tipo) => {
     const map = {
       lgpd: { label: "LGPD", cls: "bg-cyan-900/30 text-cyan-400 border-cyan-800/50" },
@@ -212,6 +223,30 @@ export default function Portais() {
               </div>
 
               {p.descricao && <p className="text-sm text-gray-400 mb-3 line-clamp-2">{p.descricao}</p>}
+
+              {(() => {
+                const cfg = getConfigObj(p);
+                if (p.tipo === "lead_passivo" && cfg.redirect_portal_url) {
+                  const dest = portais.find(x => x.url_redirect === cfg.redirect_portal_url);
+                  return (
+                    <div className="flex items-center gap-1.5 text-xs text-emerald-400 bg-emerald-950/20 border border-emerald-900/30 px-3 py-1.5 rounded-lg mb-3">
+                      <span className="text-emerald-500 font-bold">➜</span>
+                      <span>Encaminha para: <strong className="font-semibold text-white">{dest?.nome || cfg.redirect_portal_url}</strong></span>
+                    </div>
+                  );
+                }
+                if (p.tipo === "login" && cfg.link_portal_url) {
+                  const dest = portais.find(x => x.url_redirect === cfg.link_portal_url);
+                  return (
+                    <div className="flex items-center gap-1.5 text-xs text-blue-400 bg-blue-950/20 border border-blue-900/30 px-3 py-1.5 rounded-lg mb-3">
+                      <span className="text-blue-500 font-bold">🔗</span>
+                      <span>Atalho para: <strong className="font-semibold text-white">{dest?.nome || cfg.link_portal_url}</strong></span>
+                    </div>
+                  );
+                }
+                return null;
+              })()}
+
               <div className="flex items-center gap-2 mb-3 flex-wrap">
                 {p.template_nome && (
                   <span className="px-2 py-0.5 text-xs rounded border bg-emerald-950/30 text-emerald-400 border-emerald-800/50">
@@ -258,14 +293,14 @@ export default function Portais() {
 
       {/* Preview Modal */}
       {previewPortal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm transition-all duration-300">
-          <div className="bg-[#161922] w-full max-w-[90vw] rounded-2xl border border-gray-800 shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
-              {/* Modal Header */}
-            <div className="flex items-center justify-between p-4 border-b border-gray-800 bg-[#1d212d]">
+        <div className="modal-overlay">
+          <div className="modal-container max-w-[90vw]">
+            {/* Modal Header */}
+            <div className="modal-header">
               <div className="flex items-center gap-3">
-                <span className="px-2.5 py-1 bg-emerald-900/30 text-emerald-400 border border-emerald-800/50 rounded font-semibold text-[10px] tracking-wider">PREVIEW</span>
+                <span className="px-2.5 py-1 bg-emerald-950/40 text-emerald-400 border border-emerald-900/60 rounded font-semibold text-[10px] tracking-wider uppercase">PREVIEW</span>
                 <div>
-                  <h3 className="text-white font-semibold text-sm">{previewPortal.nome}</h3>
+                  <h3 className="modal-title">{previewPortal.nome}</h3>
                   <p className="text-[10px] text-gray-400">Visualização do portal em tempo real</p>
                 </div>
               </div>
@@ -296,7 +331,7 @@ export default function Portais() {
 
               <button
                 onClick={() => setPreviewPortal(null)}
-                className="text-gray-400 hover:text-white p-1.5 hover:bg-[#252b3b] rounded-lg transition-colors cursor-pointer"
+                className="modal-close-btn"
                 title="Fechar"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -306,7 +341,7 @@ export default function Portais() {
             </div>
 
             {/* Modal Content / Preview Area */}
-            <div className="flex-1 bg-[#0a0c10] p-6 flex items-center justify-center overflow-auto min-h-[450px] no-scrollbar">
+            <div className="modal-body bg-[#0a0c10] p-6 flex items-center justify-center min-h-[300px] md:min-h-[450px] no-scrollbar">
               <style>{`
                 .custom-scroll::-webkit-scrollbar {
                   width: 3px;

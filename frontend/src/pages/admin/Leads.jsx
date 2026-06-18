@@ -541,14 +541,14 @@ export default function Leads() {
         )}
       </div>
 
-      {/* Details Side Panel Drawer (Translucent Dark Overlay) */}
+          {/* Details Side Panel Drawer (Translucent Dark Overlay) */}
       {selectedLead && (
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-end transition-opacity duration-300">
-          <div className="w-full max-w-md bg-[#0a0c14]/95 border-l border-gray-800/80 h-full p-8 flex flex-col justify-between overflow-y-auto shadow-2xl relative animate-drawer-in custom-scrollbar">
+          <div className="w-full max-w-md bg-[#222538]/98 border-l border-[#323652]/80 h-full p-8 flex flex-col justify-between overflow-y-auto shadow-2xl relative animate-drawer-in custom-scrollbar">
             <div className="space-y-6">
               
               {/* Header com Avatar e Fechar */}
-              <div className="flex justify-between items-start pb-4 border-b border-gray-800/50">
+              <div className="flex justify-between items-start pb-4 border-b border-[#323652]/50">
                 <div className="flex items-center gap-4">
                   <div className="h-12 w-12 rounded-full bg-gradient-to-tr from-blue-600/20 to-emerald-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 font-extrabold shadow-inner shrink-0">
                     <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -570,7 +570,7 @@ export default function Leads() {
                 
                 <button
                   onClick={() => setSelectedLead(null)}
-                  className="p-2 border border-gray-800 hover:border-gray-750 rounded-xl text-gray-400 hover:text-white bg-gray-900/30 hover:bg-gray-800/40 transition-all cursor-pointer shrink-0"
+                  className="p-2 border border-gray-850 hover:border-gray-700 rounded-xl text-gray-400 hover:text-white bg-gray-900/30 hover:bg-gray-800/40 transition-all cursor-pointer shrink-0"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"/></svg>
                 </button>
@@ -579,7 +579,7 @@ export default function Leads() {
               {/* Seletor Segmentado de Status */}
               <div className="space-y-2">
                 <h4 className="text-[9px] uppercase font-bold tracking-widest text-gray-500 font-sans">Etapa no Funil</h4>
-                <div className="bg-[#05060a] p-1 rounded-xl border border-gray-800/80 flex w-full gap-0.5">
+                <div className="bg-[#151724] p-1 rounded-xl border border-[#323652]/80 flex w-full gap-0.5">
                   {columns.map((col) => {
                     const isSelected = selectedLead.status === col.key;
                     return (
@@ -604,13 +604,13 @@ export default function Leads() {
                 <h4 className="text-[9px] uppercase font-bold tracking-widest text-gray-500">Dados de Contrato e Rede</h4>
                 <div className="space-y-2">
                   {[
-                    { label: "Telefone", val: selectedLead.telefone, icon: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.94.725l.548 2.2a1 1 0 01-.321.988l-1.305.98a10.582 10.582 0 004.872 4.872l.98-1.305a1 1 0 01.988-.321l2.2.548a1 1 0 01.725.94V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/> },
-                    { label: "Email", val: selectedLead.email, icon: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/> },
-                    { label: "CPF", val: selectedLead.cpf, icon: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2"/> },
-                    { label: "MAC Address", val: selectedLead.mac, icon: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"/> },
-                    { label: "IP de Cadastro", val: selectedLead.ip, icon: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"/> }
+                     { label: "Telefone", val: selectedLead.telefone, icon: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.94.725l.548 2.2a1 1 0 01-.321.988l-1.305.98a10.582 10.582 0 004.872 4.872l.98-1.305a1 1 0 01.988-.321l2.2.548a1 1 0 01.725.94V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/> },
+                     { label: "Email", val: selectedLead.email, icon: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/> },
+                     { label: "CPF", val: selectedLead.cpf, icon: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2"/> },
+                     { label: "MAC Address", val: selectedLead.mac, icon: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"/> },
+                     { label: "IP de Cadastro", val: selectedLead.ip, icon: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"/> }
                   ].map((field) => (
-                    <div key={field.label} className="flex items-center justify-between p-3.5 bg-[#080a11]/90 border border-gray-800/60 rounded-2xl hover:bg-[#0c0f1b] transition-colors group/row">
+                    <div key={field.label} className="flex items-center justify-between p-3.5 bg-[#151724] border border-[#323652]/60 rounded-2xl hover:bg-[#1b1e2e] transition-colors group/row">
                       <div className="flex items-center gap-3">
                         <div className="h-8 w-8 rounded-lg bg-gray-900/60 border border-gray-800 text-gray-400 flex items-center justify-center">
                           <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -636,7 +636,7 @@ export default function Leads() {
                           {copiedField === field.label ? (
                             <svg className="w-3.5 h-3.5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"/></svg>
                           ) : (
-                            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/></svg>
+                            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/></svg>
                           )}
                         </button>
                       )}
@@ -650,7 +650,7 @@ export default function Leads() {
                 <div className="flex justify-between items-center">
                   <h4 className="text-[9px] uppercase font-bold tracking-widest text-gray-500">Anotações Comerciais</h4>
                   {noteInput !== (selectedLead.observacoes || "") && (
-                    <span className="text-[8px] bg-blue-950/60 text-blue-400 border border-blue-900/50 px-2 py-0.5 rounded uppercase font-bold animate-pulse font-mono">
+                    <span className="text-[8px] bg-blue-955/60 text-blue-400 border border-blue-900/50 px-2 py-0.5 rounded uppercase font-bold animate-pulse font-mono">
                       Salvar Pendente
                     </span>
                   )}
@@ -662,7 +662,7 @@ export default function Leads() {
                     value={noteInput}
                     onChange={(e) => setNoteInput(e.target.value)}
                     rows={4}
-                    className="w-full p-3.5 bg-[#080a11] border border-gray-800 focus:border-blue-800 rounded-2xl text-xs text-gray-300 placeholder-gray-650 focus:outline-none focus:ring-1 focus:ring-blue-900/25 resize-none leading-relaxed transition-all"
+                    className="w-full p-3.5 bg-[#151724] border border-[#323652] focus:border-blue-800 rounded-2xl text-xs text-gray-300 placeholder-gray-650 focus:outline-none focus:ring-1 focus:ring-blue-900/25 resize-none leading-relaxed transition-all"
                   />
                   <button
                     onClick={() => handleSaveNotes(selectedLead.id, noteInput)}
@@ -693,81 +693,90 @@ export default function Leads() {
 
       {/* Modal Novo Lead */}
       {showModal && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-[#161824] border border-gray-800/80 rounded-2xl w-full max-w-md shadow-2xl overflow-hidden">
-            <div className="flex items-center justify-between p-6 border-b border-gray-800/60">
-              <h2 className="text-base font-bold text-white uppercase tracking-wider">Novo Lead</h2>
+        <div className="modal-overlay">
+          <div className="modal-container max-w-md">
+            <div className="modal-header">
+              <h3 className="modal-title">
+                <svg className="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+                </svg>
+                Novo Lead
+              </h3>
               <button
+                type="button"
                 onClick={() => setShowModal(false)}
-                className="text-gray-400 hover:text-gray-250 cursor-pointer p-1.5 border border-gray-800 rounded-xl hover:bg-gray-800/40 transition-colors"
+                className="modal-close-btn"
+                title="Fechar"
               >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
             </div>
-            <form onSubmit={handleCreate} className="p-6 space-y-4">
-              <div>
-                <label className="block text-xs uppercase tracking-wider font-bold text-gray-500 mb-1.5">Nome completo</label>
-                <input
-                  type="text"
-                  value={form.nome}
-                  onChange={(e) => setForm({ ...form, nome: e.target.value })}
-                  className="w-full px-3.5 py-2.5 bg-[#0c0e15] border border-gray-800 focus:border-blue-850 rounded-xl text-gray-250 placeholder-gray-600 focus:outline-none text-sm transition-all"
-                  required
-                />
-              </div>
-              <div>
-                <label className="block text-xs uppercase tracking-wider font-bold text-gray-500 mb-1.5">E-mail</label>
-                <input
-                  type="email"
-                  value={form.email}
-                  onChange={(e) => setForm({ ...form, email: e.target.value })}
-                  className="w-full px-3.5 py-2.5 bg-[#0c0e15] border border-gray-800 focus:border-blue-850 rounded-xl text-gray-250 placeholder-gray-600 focus:outline-none text-sm transition-all"
-                />
-              </div>
-              <div className="grid grid-cols-2 gap-3">
+            <form onSubmit={handleCreate} className="flex flex-col flex-1 overflow-hidden">
+              <div className="modal-body space-y-4">
                 <div>
-                  <label className="block text-xs uppercase tracking-wider font-bold text-gray-500 mb-1.5">Telefone</label>
+                  <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">Nome Completo</label>
                   <input
                     type="text"
-                    value={form.telefone}
-                    placeholder="(21) 99999-9999"
-                    onChange={(e) => setForm({ ...form, telefone: e.target.value })}
-                    className="w-full px-3.5 py-2.5 bg-[#0c0e15] border border-gray-800 focus:border-blue-850 rounded-xl text-gray-250 placeholder-gray-600 focus:outline-none text-sm transition-all"
+                    value={form.nome}
+                    onChange={(e) => setForm({ ...form, nome: e.target.value })}
+                    className="w-full px-4 py-2.5 text-white rounded-xl focus:outline-none text-xs transition-all"
+                    required
                   />
                 </div>
                 <div>
-                  <label className="block text-xs uppercase tracking-wider font-bold text-gray-500 mb-1.5">CPF</label>
+                  <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">E-mail</label>
                   <input
-                    type="text"
-                    value={form.cpf}
-                    placeholder="000.000.000-00"
-                    onChange={(e) => setForm({ ...form, cpf: e.target.value })}
-                    className="w-full px-3.5 py-2.5 bg-[#0c0e15] border border-gray-800 focus:border-blue-850 rounded-xl text-gray-250 placeholder-gray-600 focus:outline-none text-sm transition-all"
+                    type="email"
+                    value={form.email}
+                    onChange={(e) => setForm({ ...form, email: e.target.value })}
+                    className="w-full px-4 py-2.5 text-white rounded-xl focus:outline-none text-xs transition-all"
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">Telefone</label>
+                    <input
+                      type="text"
+                      value={form.telefone}
+                      placeholder="(21) 99999-9999"
+                      onChange={(e) => setForm({ ...form, telefone: e.target.value })}
+                      className="w-full px-4 py-2.5 text-white rounded-xl focus:outline-none text-xs transition-all"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">CPF</label>
+                    <input
+                      type="text"
+                      value={form.cpf}
+                      placeholder="000.000.000-00"
+                      onChange={(e) => setForm({ ...form, cpf: e.target.value })}
+                      className="w-full px-4 py-2.5 text-white rounded-xl focus:outline-none text-xs transition-all"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">Observações Comerciais</label>
+                  <textarea
+                    value={form.observacoes}
+                    onChange={(e) => setForm({ ...form, observacoes: e.target.value })}
+                    rows={3}
+                    className="w-full px-4 py-2.5 text-white rounded-xl focus:outline-none text-xs resize-none transition-all leading-relaxed"
                   />
                 </div>
               </div>
-              <div>
-                <label className="block text-xs uppercase tracking-wider font-bold text-gray-500 mb-1.5">Observações comerciais</label>
-                <textarea
-                  value={form.observacoes}
-                  onChange={(e) => setForm({ ...form, observacoes: e.target.value })}
-                  rows={3}
-                  className="w-full px-3.5 py-2.5 bg-[#0c0e15] border border-gray-800 focus:border-blue-850 rounded-xl text-gray-250 placeholder-gray-600 focus:outline-none text-sm resize-none transition-all leading-relaxed"
-                />
-              </div>
-              <div className="flex gap-3 pt-3">
+              <div className="modal-footer">
                 <button
                   type="button"
                   onClick={() => setShowModal(false)}
-                  className="flex-1 px-4 py-2.5 bg-[#0c0e15] border border-gray-800 text-gray-400 hover:text-gray-300 rounded-xl hover:bg-gray-800/30 transition-colors text-sm font-semibold cursor-pointer"
+                  className="px-4 py-2 bg-transparent hover:bg-gray-900 border border-gray-800 text-gray-300 text-xs font-semibold rounded-xl transition-colors cursor-pointer"
                 >
                   Cancelar
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 px-4 py-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded-xl transition-all text-sm font-semibold cursor-pointer shadow-md shadow-blue-600/10 hover:scale-[1.02] active:scale-[0.98]"
+                  className="bg-gradient-to-r from-blue-600 to-indigo-650 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold text-xs py-2 px-4 rounded-xl shadow-lg hover:shadow-xl transition-all cursor-pointer"
                 >
                   Criar Lead
                 </button>

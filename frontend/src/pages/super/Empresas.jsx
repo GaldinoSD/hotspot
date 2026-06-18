@@ -229,67 +229,77 @@ export default function Empresas() {
 
         {/* Modal */}
         {showModal && (
-          <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-            <div className="bg-[#1a1d27] rounded-2xl border border-gray-700 w-full max-w-md p-6 shadow-2xl">
-              <div className="flex justify-between items-center mb-5 pb-2 border-b border-gray-800">
-                <h3 className="text-lg font-bold text-white flex items-center gap-2">
+          <div className="modal-overlay">
+            <div className="modal-container max-w-md">
+              <div className="modal-header">
+                <h3 className="modal-title">
                   <Building2 className="w-5 h-5 text-emerald-400" />
                   {editId ? "Editar Empresa" : "Nova Empresa"}
                 </h3>
-                <button onClick={() => setShowModal(false)} className="text-gray-400 hover:text-white text-lg transition-colors">×</button>
+                <button 
+                  onClick={() => setShowModal(false)} 
+                  className="modal-close-btn"
+                  title="Fechar"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
               </div>
 
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div>
-                  <label className="block text-xs text-gray-400 mb-1.5 font-medium">Nome da Empresa</label>
-                  <input
-                    type="text" required
-                    placeholder="Ex: Empresa ABC Ltda"
-                    value={form.nome} onChange={(e) => setForm({ ...form, nome: e.target.value })}
-                    className="w-full bg-[#0d1117] border border-gray-800 focus:border-blue-500 text-white rounded-xl px-3.5 py-2.5 text-sm focus:outline-none transition-all"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs text-gray-400 mb-1.5 font-medium">Email de Contato</label>
-                  <input
-                    type="email" required
-                    placeholder="contato@empresa.com"
-                    value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })}
-                    className="w-full bg-[#0d1117] border border-gray-800 focus:border-blue-500 text-white rounded-xl px-3.5 py-2.5 text-sm focus:outline-none transition-all"
-                  />
-                </div>
-                <div className="grid grid-cols-2 gap-3">
+              <form onSubmit={handleSubmit} className="flex flex-col flex-1 overflow-hidden">
+                <div className="modal-body space-y-4">
                   <div>
-                    <label className="block text-xs text-gray-400 mb-1.5 font-medium">CNPJ</label>
+                    <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">Nome da Empresa</label>
                     <input
-                      type="text"
-                      placeholder="00.000.000/0000-00"
-                      value={form.cnpj} onChange={(e) => setForm({ ...form, cnpj: e.target.value })}
-                      className="w-full bg-[#0d1117] border border-gray-800 focus:border-blue-500 text-white rounded-xl px-3.5 py-2.5 text-sm focus:outline-none transition-all font-mono"
+                      type="text" required
+                      placeholder="Ex: Empresa ABC Ltda"
+                      value={form.nome} onChange={(e) => setForm({ ...form, nome: e.target.value })}
+                      className="w-full px-4 py-2.5 text-white rounded-xl focus:outline-none text-xs transition-all"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs text-gray-400 mb-1.5 font-medium">Telefone</label>
+                    <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">Email de Contato</label>
                     <input
-                      type="text"
-                      placeholder="(00) 00000-0000"
-                      value={form.telefone} onChange={(e) => setForm({ ...form, telefone: e.target.value })}
-                      className="w-full bg-[#0d1117] border border-gray-800 focus:border-blue-500 text-white rounded-xl px-3.5 py-2.5 text-sm focus:outline-none transition-all"
+                      type="email" required
+                      placeholder="contato@empresa.com"
+                      value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })}
+                      className="w-full px-4 py-2.5 text-white rounded-xl focus:outline-none text-xs transition-all"
                     />
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">CNPJ</label>
+                      <input
+                        type="text"
+                        placeholder="00.000.000/0000-00"
+                        value={form.cnpj} onChange={(e) => setForm({ ...form, cnpj: e.target.value })}
+                        className="w-full px-4 py-2.5 text-white rounded-xl focus:outline-none text-xs transition-all font-mono"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">Telefone</label>
+                      <input
+                        type="text"
+                        placeholder="(00) 00000-0000"
+                        value={form.telefone} onChange={(e) => setForm({ ...form, telefone: e.target.value })}
+                        className="w-full px-4 py-2.5 text-white rounded-xl focus:outline-none text-xs transition-all"
+                      />
+                    </div>
                   </div>
                 </div>
 
-                <div className="flex justify-end gap-2 pt-4 border-t border-gray-800/80">
+                <div className="modal-footer">
                   <button
                     type="button"
                     onClick={() => setShowModal(false)}
-                    className="px-4 py-2 border border-gray-800 hover:bg-[#151821] text-gray-300 rounded-xl text-xs font-semibold uppercase tracking-wider transition-all cursor-pointer"
+                    className="px-4 py-2 bg-transparent hover:bg-gray-900 border border-gray-800 text-gray-300 text-xs font-semibold rounded-xl transition-colors cursor-pointer"
                   >
                     Cancelar
                   </button>
                   <button
                     type="submit"
-                    className="px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-500 text-xs font-bold uppercase tracking-wider transition-all shadow-md cursor-pointer"
+                    className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-semibold text-xs py-2 px-4 rounded-xl shadow-lg hover:shadow-xl transition-all cursor-pointer"
                   >
                     {editId ? "Salvar Alterações" : "Criar Empresa"}
                   </button>

@@ -435,128 +435,134 @@ export default function Planos() {
         )}
       </div>
 
+      {/* Modal - Criar / Editar Plano */}
       {showModal && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50">
-          <div className="bg-[#0f131f] rounded-sm border border-slate-800 w-full max-w-lg p-6 shadow-2xl animate-fade-in-up">
-            <div className="flex justify-between items-center mb-6 border-b border-slate-800/60 pb-3">
-              <h3 className="text-xs font-black uppercase tracking-widest text-white">
+        <div className="modal-overlay">
+          <div className="modal-container max-w-lg">
+            <div className="modal-header">
+              <h3 className="modal-title">
                 {editando ? "Editar Plano" : "Criar Novo Plano"}
               </h3>
               <button 
                 onClick={() => setShowModal(false)} 
-                className="text-slate-400 hover:text-white transition-colors text-lg"
+                className="modal-close-btn"
+                title="Fechar"
               >
-                ×
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
               </button>
             </div>
             
-            <form className="space-y-4" onSubmit={handleSubmit}>
-              <div>
-                <label className="block text-[9px] uppercase tracking-wider text-slate-500 font-bold mb-1.5">Nome do Plano</label>
-                <input 
-                  type="text" 
-                  className="w-full bg-[#07090e] border border-slate-800 text-slate-200 px-3 py-2.5 rounded-sm focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600/50 transition-all text-sm font-semibold" 
-                  placeholder="Ex: Plano Intermediário"
-                  value={form.nome} 
-                  onChange={(e) => setForm({ ...form, nome: e.target.value })} 
-                  required
-                />
-              </div>
-              
-              <div>
-                <label className="block text-[9px] uppercase tracking-wider text-slate-500 font-bold mb-1.5">Descrição</label>
-                <textarea 
-                  className="w-full bg-[#07090e] border border-slate-800 text-slate-200 px-3 py-2.5 rounded-sm focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600/50 transition-all text-sm h-20 resize-none" 
-                  placeholder="Descreva o plano ou políticas de acesso..."
-                  value={form.descricao} 
-                  onChange={(e) => setForm({ ...form, descricao: e.target.value })} 
-                />
-              </div>
-              
-              <div className="grid grid-cols-2 gap-4">
+            <form className="flex flex-col flex-1 overflow-hidden" onSubmit={handleSubmit}>
+              <div className="modal-body space-y-4">
                 <div>
-                  <label className="block text-[9px] uppercase tracking-wider text-slate-500 font-bold mb-1.5">Duração (minutos)</label> 
-                  <input 
-                    type="number" 
-                    className="w-full bg-[#07090e] border border-slate-800 text-slate-200 px-3 py-2.5 rounded-sm focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600/50 transition-all text-sm font-mono" 
-                    value={form.duracao} 
-                    onChange={(e) => setForm({ ...form, duracao: e.target.value })} 
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block text-[9px] uppercase tracking-wider text-slate-500 font-bold mb-1.5">Valor (R$)</label>
+                  <label className="block text-[9px] uppercase tracking-wider text-slate-500 font-bold mb-1.5">Nome do Plano</label>
                   <input 
                     type="text" 
-                    className="w-full bg-[#07090e] border border-slate-800 text-slate-200 px-3 py-2.5 rounded-sm focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600/50 transition-all text-sm font-mono" 
-                    placeholder="0,00"
-                    value={form.valor} 
-                    onChange={(e) => setForm({ ...form, valor: e.target.value })} 
+                    className="w-full text-slate-200 px-3 py-2.5 rounded-sm focus:outline-none transition-all text-sm font-semibold" 
+                    placeholder="Ex: Plano Intermediário"
+                    value={form.nome} 
+                    onChange={(e) => setForm({ ...form, nome: e.target.value })} 
                     required
                   />
                 </div>
-              </div>
-              
-              <div className="grid grid-cols-2 gap-4">
+                
                 <div>
-                  <label className="block text-[9px] uppercase tracking-wider text-slate-500 font-bold mb-1.5">Download (Mbps)</label>
-                  <input 
-                    type="number" 
-                    className="w-full bg-[#07090e] border border-slate-800 text-slate-200 px-3 py-2.5 rounded-sm focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600/50 transition-all text-sm font-mono" 
-                    value={form.velocidade_download} 
-                    onChange={(e) => setForm({ ...form, velocidade_download: e.target.value })} 
-                    required
+                  <label className="block text-[9px] uppercase tracking-wider text-slate-500 font-bold mb-1.5">Descrição</label>
+                  <textarea 
+                    className="w-full text-slate-200 px-3 py-2.5 rounded-sm focus:outline-none transition-all text-sm h-20 resize-none" 
+                    placeholder="Descreva o plano ou políticas de acesso..."
+                    value={form.descricao} 
+                    onChange={(e) => setForm({ ...form, descricao: e.target.value })} 
                   />
                 </div>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-[9px] uppercase tracking-wider text-slate-500 font-bold mb-1.5">Duração (minutos)</label> 
+                    <input 
+                      type="number" 
+                      className="w-full text-slate-200 px-3 py-2.5 rounded-sm focus:outline-none transition-all text-sm font-mono" 
+                      value={form.duracao} 
+                      onChange={(e) => setForm({ ...form, duracao: e.target.value })} 
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[9px] uppercase tracking-wider text-slate-500 font-bold mb-1.5">Valor (R$)</label>
+                    <input 
+                      type="text" 
+                      className="w-full text-slate-200 px-3 py-2.5 rounded-sm focus:outline-none transition-all text-sm font-mono" 
+                      placeholder="0,00"
+                      value={form.valor} 
+                      onChange={(e) => setForm({ ...form, valor: e.target.value })} 
+                      required
+                    />
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-[9px] uppercase tracking-wider text-slate-500 font-bold mb-1.5">Download (Mbps)</label>
+                    <input 
+                      type="number" 
+                      className="w-full text-slate-200 px-3 py-2.5 rounded-sm focus:outline-none transition-all text-sm font-mono" 
+                      value={form.velocidade_download} 
+                      onChange={(e) => setForm({ ...form, velocidade_download: e.target.value })} 
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[9px] uppercase tracking-wider text-slate-500 font-bold mb-1.5">Upload (Mbps)</label>
+                    <input 
+                      type="number" 
+                      className="w-full text-slate-200 px-3 py-2.5 rounded-sm focus:outline-none transition-all text-sm font-mono" 
+                      value={form.velocidade_upload} 
+                      onChange={(e) => setForm({ ...form, velocidade_upload: e.target.value })} 
+                      required
+                    />
+                  </div>
+                </div>
+                
                 <div>
-                  <label className="block text-[9px] uppercase tracking-wider text-slate-500 font-bold mb-1.5">Upload (Mbps)</label>
-                  <input 
-                    type="number" 
-                    className="w-full bg-[#07090e] border border-slate-800 text-slate-200 px-3 py-2.5 rounded-sm focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600/50 transition-all text-sm font-mono" 
-                    value={form.velocidade_upload} 
-                    onChange={(e) => setForm({ ...form, velocidade_upload: e.target.value })} 
+                  <label className="block text-[9px] uppercase tracking-wider text-slate-500 font-bold mb-1.5">Mikrotik</label>
+                  <select 
+                    className="w-full text-slate-300 px-3 py-2.5 rounded-sm focus:outline-none transition-all text-sm cursor-pointer" 
+                    value={form.mikrotik_id} 
+                    onChange={(e) => setForm({ ...form, mikrotik_id: e.target.value })}
                     required
+                  >
+                    <option value="">Selecione o Mikrotik</option>
+                    {mikrotiks.map((m) => (
+                      <option key={m.id} value={m.id}>{m.nome}</option>
+                    ))}
+                  </select>
+                </div>
+                
+                <div className="flex items-center gap-2.5 pt-2">
+                  <input 
+                    type="checkbox" 
+                    id="ativo-chk"
+                    className="rounded-sm bg-[#07090e] border-slate-800 text-blue-600 focus:ring-0 w-4 h-4 cursor-pointer"
+                    checked={form.ativo} 
+                    onChange={(e) => setForm({ ...form, ativo: e.target.checked })} 
                   />
+                  <label htmlFor="ativo-chk" className="text-xs text-slate-400 cursor-pointer select-none">Disponibilizar plano para contratação (Ativo)</label>
                 </div>
               </div>
               
-              <div>
-                <label className="block text-[9px] uppercase tracking-wider text-slate-500 font-bold mb-1.5">Mikrotik</label>
-                <select 
-                  className="w-full bg-[#07090e] border border-slate-800 text-slate-300 px-3 py-2.5 rounded-sm focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600/50 transition-all text-sm" 
-                  value={form.mikrotik_id} 
-                  onChange={(e) => setForm({ ...form, mikrotik_id: e.target.value })}
-                  required
-                >
-                  <option value="">Selecione o Mikrotik</option>
-                  {mikrotiks.map((m) => (
-                    <option key={m.id} value={m.id}>{m.nome}</option>
-                  ))}
-                </select>
-              </div>
-              
-              <div className="flex items-center gap-2.5 pt-2">
-                <input 
-                  type="checkbox" 
-                  id="ativo-chk"
-                  className="rounded-sm bg-[#07090e] border-slate-800 text-blue-600 focus:ring-0 w-4 h-4 cursor-pointer"
-                  checked={form.ativo} 
-                  onChange={(e) => setForm({ ...form, ativo: e.target.checked })} 
-                />
-                <label htmlFor="ativo-chk" className="text-xs text-slate-400 cursor-pointer select-none">Disponibilizar plano para contratação (Ativo)</label>
-              </div>
-              
-              <div className="flex justify-end gap-3 pt-6 border-t border-slate-800/60 mt-4">
+              <div className="modal-footer">
                 <button 
                   type="button" 
                   onClick={() => setShowModal(false)} 
-                  className="px-4 py-2.5 border border-slate-800 text-slate-400 rounded-sm hover:bg-slate-900 hover:text-slate-200 transition-colors text-xs uppercase tracking-wider font-bold"
+                  className="px-4 py-2.5 border border-slate-800 text-slate-400 rounded-sm hover:bg-slate-900 hover:text-slate-200 transition-colors text-xs uppercase tracking-wider font-bold cursor-pointer"
                 >
                   Cancelar
                 </button>
                 <button 
                   type="submit" 
-                  className="px-5 py-2.5 bg-blue-600 text-white hover:bg-blue-500 rounded-sm transition-colors text-xs uppercase tracking-wider font-bold"
+                  className="px-5 py-2.5 bg-blue-600 text-white hover:bg-blue-500 rounded-sm transition-colors text-xs uppercase tracking-wider font-bold cursor-pointer"
                 >
                   {editando ? "Salvar Alterações" : "Criar Plano"}
                 </button>

@@ -4,6 +4,7 @@ import { redirecionarHotspot } from "../../utils/hotspotRedirect";
 
 export default function LgpdAuto() {
   const [dados, setDados] = useState({ cpf: "", mac: "", ip: "", email: "", nome: "", telefone: "" });
+  const [cfg, setCfg] = useState({});
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -15,10 +16,11 @@ export default function LgpdAuto() {
     const nome = params.get("nome");
     const telefone = params.get("telefone");
     const mikrotik_id = params.get("mikrotik_id");
+    const empId = params.get("empresa_id");
 
     setDados({ cpf, mac, ip, email, nome, telefone });
 
-    const autenticar = async () => {
+    const autenticar = async (currentCfg) => {
       try {
         const res = await fetch("/api/lgpd/login", {
           method: "POST",
@@ -28,7 +30,7 @@ export default function LgpdAuto() {
 
         const data = await res.json();
         if (res.ok && data.gateway && data.username) {
-          redirecionarHotspot(data.gateway, data.username, data.password);
+          redirecionarHotspot(data.gateway, data.username, data.password, 0, { cfg: currentCfg, mac, ip, mikrotikId: mikrotik_id });
         } else {
           alert(data.message || "Erro ao autenticar.");
         }
@@ -37,7 +39,19 @@ export default function LgpdAuto() {
       }
     };
 
-    setTimeout(autenticar, 3000);
+    if (empId) {
+      fetch(`/api/portal-config/lgpd?empresa_id=${empId}`)
+        .then(r => r.json())
+        .then(fetchedCfg => {
+          setCfg(fetchedCfg);
+          setTimeout(() => autenticar(fetchedCfg), 3000);
+        })
+        .catch(() => {
+          setTimeout(() => autenticar({}), 3000);
+        });
+    } else {
+      setTimeout(() => autenticar({}), 3000);
+    }
   }, []);
 
   return (

@@ -294,57 +294,75 @@ export default function EmpresasAdmin() {
 
         {/* Modal Criar/Editar Empresa */}
         {showModal && (
-          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fadeIn">
-            <form onSubmit={handleSubmit} className="bg-[#131722] border border-slate-800 rounded-xl p-6 w-full max-w-md shadow-2xl relative animate-scaleIn">
-              <h2 className="text-lg font-bold text-slate-100 mb-5 flex items-center gap-2">
-                <Building2 className="w-5 h-5 text-orange-500" />
-                {editId ? "Editar Empresa" : "Nova Empresa"}
-              </h2>
-              {erro && <p className="text-red-400 text-sm mb-4 bg-red-950/20 border border-red-900/30 p-2.5 rounded-lg">{erro}</p>}
-              <div className="space-y-4">
+          <div className="modal-overlay">
+            <form onSubmit={handleSubmit} className="modal-container max-w-md">
+              <div className="modal-header">
+                <h3 className="modal-title">
+                  <Building2 className="w-5 h-5 text-orange-500" />
+                  {editId ? "Editar Empresa" : "Nova Empresa"}
+                </h3>
+                <button 
+                  type="button"
+                  onClick={() => setShowModal(false)} 
+                  className="modal-close-btn"
+                  title="Fechar"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+
+              <div className="modal-body space-y-4">
+                {erro && <p className="text-red-400 text-xs font-semibold mb-4 bg-red-955/20 border border-red-900/30 p-2.5 rounded-xl">{erro}</p>}
+
                 <div>
-                  <label className="block text-slate-400 text-xs font-semibold uppercase tracking-wider mb-2">Nome *</label>
+                  <label className="block text-slate-400 text-[10px] font-bold uppercase tracking-wider mb-2">Nome *</label>
                   <input type="text" required value={form.nome} onChange={(e) => setForm({ ...form, nome: e.target.value })}
-                    className="w-full bg-[#090b11] border border-slate-800 text-white rounded-lg px-3.5 py-2.5 outline-none focus:border-orange-500 transition-all placeholder-slate-600 text-sm font-sans" />
+                    className="w-full px-4 py-2.5 text-white rounded-xl focus:outline-none text-xs transition-all" />
                 </div>
+
                 <div>
-                  <label className="block text-slate-400 text-xs font-semibold uppercase tracking-wider mb-2">Email *</label>
+                  <label className="block text-slate-400 text-[10px] font-bold uppercase tracking-wider mb-2">Email *</label>
                   <div className="relative">
                     <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-500">
                       <Mail className="w-4 h-4" />
                     </span>
                     <input type="email" required value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })}
-                      className="w-full bg-[#090b11] border border-slate-800 text-white rounded-lg pl-10 pr-3.5 py-2.5 outline-none focus:border-orange-500 transition-all placeholder-slate-600 text-sm font-sans" />
+                      className="w-full pl-10 pr-4 py-2.5 text-white rounded-xl focus:outline-none text-xs transition-all" />
                   </div>
                 </div>
+
                 <div>
-                  <label className="block text-slate-400 text-xs font-semibold uppercase tracking-wider mb-2">CNPJ</label>
+                  <label className="block text-slate-400 text-[10px] font-bold uppercase tracking-wider mb-2">CNPJ</label>
                   <div className="relative">
                     <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-500">
                       <FileText className="w-4 h-4" />
                     </span>
                     <input type="text" placeholder="00.000.000/0000-00" value={form.cnpj} onChange={(e) => setForm({ ...form, cnpj: e.target.value })}
-                      className="w-full bg-[#090b11] border border-slate-800 text-white rounded-lg pl-10 pr-3.5 py-2.5 outline-none focus:border-orange-500 transition-all placeholder-slate-600 text-sm font-sans font-mono" />
+                      className="w-full pl-10 pr-4 py-2.5 text-white rounded-xl focus:outline-none text-xs transition-all font-mono" />
                   </div>
                 </div>
+
                 <div>
-                  <label className="block text-slate-400 text-xs font-semibold uppercase tracking-wider mb-2">Telefone</label>
+                  <label className="block text-slate-400 text-[10px] font-bold uppercase tracking-wider mb-2">Telefone</label>
                   <div className="relative">
                     <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-500">
                       <Phone className="w-4 h-4" />
                     </span>
                     <input type="text" placeholder="(00) 00000-0000" value={form.telefone} onChange={(e) => setForm({ ...form, telefone: e.target.value })}
-                      className="w-full bg-[#090b11] border border-slate-800 text-white rounded-lg pl-10 pr-3.5 py-2.5 outline-none focus:border-orange-500 transition-all placeholder-slate-600 text-sm font-sans font-mono" />
+                      className="w-full pl-10 pr-4 py-2.5 text-white rounded-xl focus:outline-none text-xs transition-all font-mono" />
                   </div>
                 </div>
               </div>
-              <div className="flex gap-3 mt-6">
+
+              <div className="modal-footer">
                 <button type="button" onClick={() => setShowModal(false)}
-                  className="flex-1 border border-slate-800 hover:bg-slate-900 text-slate-300 py-2.5 rounded-lg text-sm font-medium transition-colors">
+                  className="px-4 py-2 bg-transparent hover:bg-gray-900 border border-gray-800 text-slate-350 text-xs font-semibold rounded-xl transition-colors cursor-pointer">
                   Cancelar
                 </button>
-                <button type="submit" className="flex-1 bg-orange-600 hover:bg-orange-500 text-white py-2.5 rounded-lg text-sm font-semibold transition-all shadow-lg hover:shadow-orange-600/10 active:scale-95">
-                  {editId ? "Salvar" : "Criar"}
+                <button type="submit" className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white font-semibold text-xs py-2 px-4 rounded-xl shadow-lg hover:shadow-xl transition-all cursor-pointer">
+                  {editId ? "Salvar Alterações" : "Criar Empresa"}
                 </button>
               </div>
             </form>
@@ -353,62 +371,74 @@ export default function EmpresasAdmin() {
 
       {/* Modal Admins da Empresa */}
       {showAdminsModal && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fadeIn">
-          <div className="bg-[#131722] border border-slate-800 rounded-xl p-6 w-full max-w-lg shadow-2xl relative max-h-[85vh] overflow-y-auto animate-scaleIn">
-            <div className="flex items-center justify-between mb-5">
-              <h2 className="text-lg font-bold text-slate-100 flex items-center gap-2">
+        <div className="modal-overlay">
+          <div className="modal-container max-w-lg">
+            <div className="modal-header">
+              <h3 className="modal-title">
                 <Users className="w-5 h-5 text-orange-500" />
                 Admins Vinculados
-              </h2>
-              <button onClick={() => setShowAdminsModal(null)} className="text-slate-400 hover:text-white transition-colors text-lg">✕</button>
+              </h3>
+              <button onClick={() => setShowAdminsModal(null)} className="modal-close-btn" title="Fechar">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
             </div>
 
-            {/* Lista de admins vinculados */}
-            <div className="space-y-2 mb-6">
-              {adminsEmpresa.length === 0 && <p className="text-slate-500 text-sm py-2 text-center">Nenhum admin vinculado</p>}
-              {adminsEmpresa.map(a => (
-                <div key={a.id} className="flex items-center justify-between bg-[#090b11] border border-slate-800/80 rounded-lg px-4 py-3 group/admin-row">
-                  <div>
-                    <p className="text-slate-200 text-sm font-semibold group-hover/admin-row:text-white transition-colors">{a.nome || a.email}</p>
-                    <p className="text-slate-500 text-xs font-mono">{a.email} · <span className="text-orange-500 font-sans font-semibold">{a.role_empresa}</span></p>
+            <div className="modal-body space-y-4">
+              {/* Lista de admins vinculados */}
+              <div className="space-y-2">
+                {adminsEmpresa.length === 0 && <p className="text-slate-500 text-xs py-4 text-center">Nenhum admin vinculado</p>}
+                {adminsEmpresa.map(a => (
+                  <div key={a.id} className="flex items-center justify-between bg-[#151724] border border-[#323652]/50 rounded-xl px-4 py-3 group/admin-row">
+                    <div>
+                      <p className="text-slate-200 text-xs font-semibold group-hover/admin-row:text-white transition-colors">{a.nome || a.email}</p>
+                      <p className="text-slate-500 text-[10px] font-mono mt-0.5">{a.email} · <span className="text-orange-555 font-sans font-semibold">{a.role_empresa}</span></p>
+                    </div>
+                    <button onClick={() => desvincularAdmin(a.id)}
+                      className="p-1.5 border border-slate-800 text-slate-400 rounded-lg hover:bg-red-955/20 hover:text-red-400 hover:border-red-900/30 transition-all active:scale-95">
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
                   </div>
-                  <button onClick={() => desvincularAdmin(a.id)}
-                    className="p-1.5 border border-slate-800 text-slate-400 rounded-lg hover:bg-red-500/10 hover:text-red-500 hover:border-red-500/20 transition-all active:scale-95">
-                    <Trash2 className="w-3.5 h-3.5" />
+                ))}
+              </div>
+
+              {/* Vincular novo admin */}
+              <div className="border-t border-[#26293c] pt-4">
+                <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Vincular Admin</h4>
+                <div className="flex flex-col sm:flex-row gap-2">
+                  <select value={vinculandoAdmin.admin_id}
+                    onChange={(e) => setVinculandoAdmin({ ...vinculandoAdmin, admin_id: e.target.value })}
+                    className="flex-1 px-4 py-2.5 text-white rounded-xl focus:outline-none text-xs transition-all cursor-pointer">
+                    <option value="" className="bg-[#121420]">Selecione um admin...</option>
+                    {todosAdmins.filter(a => !adminsEmpresa.find(ae => ae.id === a.id)).map(a => (
+                      <option key={a.id} value={a.id} className="bg-[#121420]">{a.nome || a.email} ({a.role})</option>
+                    ))}
+                  </select>
+                  <select value={vinculandoAdmin.role}
+                    onChange={(e) => setVinculandoAdmin({ ...vinculandoAdmin, role: e.target.value })}
+                    className="px-4 py-2.5 text-white rounded-xl focus:outline-none text-xs transition-all cursor-pointer sm:w-32">
+                    <option value="owner" className="bg-[#121420]">Owner</option>
+                    <option value="manager" className="bg-[#121420]">Manager</option>
+                    <option value="operator" className="bg-[#121420]">Operator</option>
+                  </select>
+                  <button onClick={vincularAdmin}
+                    className="bg-gradient-to-r from-orange-600 to-orange-550 hover:from-orange-700 hover:to-orange-600 text-white px-4 py-2.5 rounded-xl text-xs font-bold shadow-lg hover:shadow-xl transition-all cursor-pointer flex items-center justify-center">
+                    Vincular
                   </button>
                 </div>
-              ))}
+              </div>
             </div>
 
-            {/* Vincular novo admin */}
-            <div className="border-t border-slate-800/80 pt-5">
-              <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Vincular Admin</h3>
-              <div className="flex flex-col sm:flex-row gap-2">
-                <select value={vinculandoAdmin.admin_id}
-                  onChange={(e) => setVinculandoAdmin({ ...vinculandoAdmin, admin_id: e.target.value })}
-                  className="flex-1 bg-[#090b11] border border-slate-800 text-white rounded-lg px-3.5 py-2.5 outline-none focus:border-orange-500 text-sm transition-all">
-                  <option value="">Selecione um admin...</option>
-                  {todosAdmins.filter(a => !adminsEmpresa.find(ae => ae.id === a.id)).map(a => (
-                    <option key={a.id} value={a.id}>{a.nome || a.email} ({a.role})</option>
-                  ))}
-                </select>
-                <select value={vinculandoAdmin.role}
-                  onChange={(e) => setVinculandoAdmin({ ...vinculandoAdmin, role: e.target.value })}
-                  className="bg-[#090b11] border border-slate-800 text-white rounded-lg px-3.5 py-2.5 outline-none focus:border-orange-500 text-sm transition-all sm:w-32">
-                  <option value="owner">Owner</option>
-                  <option value="manager">Manager</option>
-                  <option value="operator">Operator</option>
-                </select>
-                <button onClick={vincularAdmin}
-                  className="bg-orange-600 hover:bg-orange-500 text-white px-4 py-2.5 rounded-lg text-sm font-semibold transition-all shadow-lg hover:shadow-orange-600/10 active:scale-95 flex items-center justify-center">
-                  Vincular
-                </button>
-              </div>
+            <div className="modal-footer">
+              <button onClick={() => setShowAdminsModal(null)} className="px-4 py-2 bg-transparent hover:bg-gray-900 border border-gray-800 text-slate-350 text-xs font-semibold rounded-xl transition-colors cursor-pointer">
+                Fechar
+              </button>
             </div>
           </div>
         </div>
       )}
-    </div>
-  </AdminLayout>
-);
+      </div>
+    </AdminLayout>
+  );
 }

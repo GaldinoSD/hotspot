@@ -366,42 +366,50 @@ export default function Wireguard() {
 
       {/* Add Modal */}
       {showAddModal && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 animate-fade-in">
-          <div className="bg-[#0f131f] border border-slate-800 w-full max-w-md p-6 rounded-sm shadow-2xl animate-fade-in-up">
-            <div className="flex justify-between items-center mb-6 border-b border-slate-800/60 pb-3">
-              <h3 className="text-xs font-black uppercase tracking-widest text-white">Adicionar Novo Peer</h3>
+        <div className="modal-overlay">
+          <div className="modal-container max-w-md">
+            <div className="modal-header">
+              <h3 className="modal-title">
+                <Plus className="w-5 h-5 text-blue-400" />
+                Adicionar Novo Peer
+              </h3>
               <button 
                 onClick={() => setShowAddModal(false)} 
-                className="text-slate-400 hover:text-white transition-colors text-lg"
+                className="modal-close-btn"
+                title="Fechar"
               >
-                ×
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
               </button>
             </div>
             
-            <form onSubmit={handleAddPeer} className="space-y-4">
-              <div>
-                <label className="text-[9px] uppercase tracking-wider text-slate-500 font-bold block mb-1.5">Identificação (Nome do Mikrotik)</label>
-                <input
-                  autoFocus
-                  placeholder="Ex: RB-Torre-Centro"
-                  className="w-full bg-[#07090e] border border-slate-800 text-slate-200 px-3 py-2.5 rounded-sm focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600/50 transition-all text-sm font-semibold"
-                  value={newPeerName}
-                  onChange={(e) => setNewPeerName(e.target.value)}
-                  required
-                />
+            <form onSubmit={handleAddPeer} className="flex flex-col flex-1 overflow-hidden">
+              <div className="modal-body space-y-4">
+                <div>
+                  <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">Identificação (Nome do Mikrotik)</label>
+                  <input
+                    autoFocus
+                    placeholder="Ex: RB-Torre-Centro"
+                    className="w-full px-4 py-2.5 text-white rounded-xl focus:outline-none text-xs transition-all font-semibold"
+                    value={newPeerName}
+                    onChange={(e) => setNewPeerName(e.target.value)}
+                    required
+                  />
+                </div>
               </div>
               
-              <div className="flex justify-end gap-3 pt-6 border-t border-slate-800/60 mt-4">
+              <div className="modal-footer">
                 <button 
                   type="button" 
                   onClick={() => setShowAddModal(false)} 
-                  className="px-4 py-2.5 border border-slate-800 text-slate-400 rounded-sm hover:bg-slate-900 hover:text-slate-200 transition-colors text-xs uppercase tracking-wider font-bold"
+                  className="px-4 py-2 bg-transparent hover:bg-gray-900 border border-gray-800 text-gray-300 text-xs font-semibold rounded-xl transition-colors cursor-pointer"
                 >
                   Cancelar
                 </button>
                 <button 
                   type="submit" 
-                  className="px-5 py-2.5 bg-blue-600 text-white hover:bg-blue-500 rounded-sm transition-colors text-xs uppercase tracking-wider font-bold"
+                  className="bg-gradient-to-r from-blue-600 to-indigo-650 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold text-xs py-2 px-4 rounded-xl shadow-lg hover:shadow-xl transition-all cursor-pointer"
                 >
                   Criar e Gerar Script
                 </button>
@@ -413,40 +421,48 @@ export default function Wireguard() {
 
       {/* Script Modal */}
       {showScriptModal && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 animate-fade-in">
-          <div className="bg-[#0f131f] border border-slate-800 w-full max-w-2xl p-6 rounded-sm shadow-2xl animate-fade-in-up">
-            <div className="flex justify-between items-center mb-4 border-b border-slate-800/60 pb-3">
-              <h3 className="text-xs font-black uppercase tracking-widest text-white">Script de Instalação Rápida</h3>
+        <div className="modal-overlay">
+          <div className="modal-container max-w-2xl">
+            <div className="modal-header">
+              <h3 className="modal-title">
+                <Code className="w-5 h-5 text-blue-400" />
+                Script de Instalação Rápida
+              </h3>
               <button 
                 onClick={() => setShowScriptModal(false)} 
-                className="text-slate-400 hover:text-white transition-colors text-lg"
+                className="modal-close-btn"
+                title="Fechar"
               >
-                ×
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
               </button>
             </div>
             
-            <p className="text-slate-400 text-xs leading-relaxed mb-4">
-              Copie o código abaixo e cole no console (<strong className="text-white">New Terminal</strong>) do seu Mikrotik. Ele criará as interfaces e conectará a VPN automaticamente.
-            </p>
-            
-            <div className="bg-[#07090e] border border-slate-800/60 rounded-sm p-4 relative group">
-              <pre className="text-xs text-emerald-400 font-mono whitespace-pre-wrap overflow-y-auto max-h-80 select-all leading-relaxed pr-10">
-                {scriptData}
-              </pre>
+            <div className="modal-body space-y-4">
+              <p className="text-slate-400 text-xs leading-relaxed">
+                Copie o código abaixo e cole no console (<strong className="text-white font-semibold">New Terminal</strong>) do seu Mikrotik. Ele criará as interfaces e conectará a VPN automaticamente.
+              </p>
               
-              <button 
-                onClick={copyToClipboard}
-                className="absolute top-3 right-3 bg-blue-600 hover:bg-blue-500 text-white p-2 rounded-sm shadow-md transition-all active:scale-95 flex items-center justify-center"
-                title="Copiar Script"
-              >
-                {copied ? <Check className="w-4 h-4 text-emerald-300" /> : <Copy className="w-4 h-4" />}
-              </button>
+              <div className="bg-[#151724] border border-[#323652] rounded-xl p-4 relative group">
+                <pre className="text-xs text-emerald-400 font-mono whitespace-pre-wrap overflow-y-auto max-h-80 select-all leading-relaxed pr-10">
+                  {scriptData}
+                </pre>
+                
+                <button 
+                  onClick={copyToClipboard}
+                  className="absolute top-3.5 right-3.5 bg-blue-600 hover:bg-blue-500 text-white p-2 rounded-xl shadow-md transition-all active:scale-95 flex items-center justify-center cursor-pointer"
+                  title="Copiar Script"
+                >
+                  {copied ? <Check className="w-4 h-4 text-emerald-300" /> : <Copy className="w-4 h-4" />}
+                </button>
+              </div>
             </div>
 
-            <div className="flex justify-end pt-6 border-t border-slate-800/60 mt-6">
+            <div className="modal-footer">
               <button 
                 onClick={() => setShowScriptModal(false)} 
-                className="px-5 py-2 bg-slate-800 text-slate-200 hover:bg-slate-700 hover:text-white transition-colors rounded-sm text-xs uppercase tracking-wider font-bold"
+                className="px-4 py-2 bg-transparent hover:bg-gray-900 border border-gray-800 text-gray-300 text-xs font-semibold rounded-xl transition-colors cursor-pointer"
               >
                 Fechar
               </button>

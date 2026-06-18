@@ -76,7 +76,7 @@ export default function CadastroCliente() {
       if (data.planoAtivo && data.gateway) {
         const minutos = Math.floor((data.tempoRestante || 0) / 60);
         setLoginAutomatico({ nome: data.nome, minutos });
-        redirecionarHotspot(data.gateway, data.username, data.password, 2500);
+        redirecionarHotspot(data.gateway, data.username, data.password, 2500, { cfg, mac, ip, mikrotikId });
         return;
       }
 

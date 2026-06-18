@@ -126,25 +126,42 @@ export default function Configuracoes() {
 
       {/* Confirmation Modal */}
       {modal && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fadeIn">
-          <div className="bg-[#131722] rounded-xl border border-slate-800 p-6 max-w-sm w-full shadow-2xl relative animate-scaleIn">
-            <h2 className="text-lg font-bold text-slate-100 mb-3 flex items-center gap-2">
-              <AlertTriangle className="w-5 h-5 text-red-500" />
-              Confirmar Ação
-            </h2>
-            <p className="text-slate-350 text-sm leading-relaxed mb-6">
-              Tem certeza que deseja executar <strong>{modal.titulo}</strong>? Essa operação apagará dados permanentemente e não poderá ser desfeita.
-            </p>
-            <div className="flex justify-end gap-3">
+        <div className="modal-overlay">
+          <div className="modal-container max-w-sm">
+            <div className="modal-header">
+              <h3 className="modal-title">
+                <AlertTriangle className="w-5 h-5 text-red-500" />
+                Confirmar Ação
+              </h3>
+              <button 
+                onClick={() => setModal(null)} 
+                className="modal-close-btn"
+                title="Fechar"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            <div className="modal-body">
+              <p className="text-slate-350 text-sm leading-relaxed">
+                Tem certeza que deseja executar <strong>{modal.titulo}</strong>? Essa operação apagará dados permanentemente e não poderá ser desfeita.
+              </p>
+            </div>
+
+            <div className="modal-footer">
               <button
+                type="button"
                 onClick={() => setModal(null)}
-                className="px-4 py-2.5 rounded-lg border border-slate-800 hover:bg-slate-900 text-sm font-medium transition-colors text-slate-300"
+                className="px-4 py-2.5 rounded-lg border border-slate-800 hover:bg-slate-900 text-sm font-medium text-slate-300 transition-colors cursor-pointer"
               >
                 Cancelar
               </button>
               <button
+                type="button"
                 onClick={() => executarAcao(modal)}
-                className="px-4 py-2.5 rounded-lg bg-red-600 hover:bg-red-550 text-white text-sm font-semibold transition-all shadow-lg hover:shadow-red-600/10 active:scale-95 flex items-center gap-2"
+                className="px-4 py-2.5 rounded-lg bg-red-600 hover:bg-red-550 text-white text-sm font-semibold transition-all shadow-lg hover:shadow-red-600/10 active:scale-95 flex items-center gap-2 cursor-pointer"
                 disabled={loading}
               >
                 {loading ? (

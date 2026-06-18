@@ -263,85 +263,96 @@ const UsuariosRadius = () => {
 
       {/* Modal - Novo Usuário RADIUS */}
       {mostrarModal && (
-        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50">
-          <div className="bg-[#121420] border border-gray-800/60 rounded-2xl p-6 w-full max-w-md shadow-2xl relative overflow-hidden animate-fade-in">
-            <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-500/5 rounded-full blur-2xl transform translate-x-4 -translate-y-4"></div>
-            
-            <h3 className="text-sm font-semibold text-white mb-5 flex items-center gap-2">
-              <svg className="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
-              </svg>
-              Novo Usuário RADIUS
-            </h3>
+        <div className="modal-overlay">
+          <div className="modal-container max-w-md">
+            <div className="modal-header">
+              <h3 className="modal-title">
+                <svg className="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+                </svg>
+                Novo Usuário RADIUS
+              </h3>
+              <button 
+                onClick={() => setMostrarModal(false)} 
+                className="modal-close-btn"
+                title="Fechar"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
 
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <label htmlFor="radius-username" className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">Usuário (Username)</label>
-                <input
-                  id="radius-username"
-                  type="text"
-                  placeholder="Ex: CPF ou número de celular"
-                  className="w-full px-4 py-2.5 bg-[#0d1117] border border-gray-800/60 text-white rounded-xl focus:outline-none focus:border-emerald-500/50 text-xs transition-all focus:ring-1 focus:ring-emerald-500/30"
-                  value={username}
-                  onChange={e => setUsername(e.target.value)}
-                  required
-                />
+            <form onSubmit={handleSubmit} className="flex flex-col flex-1 overflow-hidden">
+              <div className="modal-body space-y-4">
+                <div>
+                  <label htmlFor="radius-username" className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">Usuário (Username)</label>
+                  <input
+                    id="radius-username"
+                    type="text"
+                    placeholder="Ex: CPF ou número de celular"
+                    className="w-full px-4 py-2.5 text-white rounded-xl focus:outline-none text-xs transition-all"
+                    value={username}
+                    onChange={e => setUsername(e.target.value)}
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="radius-password" className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">Senha (Password)</label>
+                  <input
+                    id="radius-password"
+                    type="password"
+                    placeholder="Digite a senha de acesso"
+                    className="w-full px-4 py-2.5 text-white rounded-xl focus:outline-none text-xs transition-all"
+                    value={password}
+                    onChange={e => setPassword(e.target.value)}
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="radius-plano" className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">Vincular Plano (Opcional)</label>
+                  <select
+                    id="radius-plano"
+                    className="w-full px-4 py-2.5 text-white rounded-xl focus:outline-none text-xs transition-all cursor-pointer"
+                    value={planoSelecionado}
+                    onChange={e => setPlanoSelecionado(e.target.value)}
+                  >
+                    <option value="" className="bg-[#121420]">Selecione um plano...</option>
+                    {planos.map(plano => (
+                      <option key={plano.id} value={plano.id} className="bg-[#121420]">
+                        {plano.nome} (Duração: {plano.duracao_minutos} min)
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {status && (
+                  <p className={`text-xs mt-3 text-center font-medium ${
+                    status.includes('sucesso') ? 'text-emerald-400' : 'text-amber-400'
+                  }`}>
+                    {status}
+                  </p>
+                )}
               </div>
 
-              <div>
-                <label htmlFor="radius-password" className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">Senha (Password)</label>
-                <input
-                  id="radius-password"
-                  type="password"
-                  placeholder="Digite a senha de acesso"
-                  className="w-full px-4 py-2.5 bg-[#0d1117] border border-gray-800/60 text-white rounded-xl focus:outline-none focus:border-emerald-500/50 text-xs transition-all focus:ring-1 focus:ring-emerald-500/30"
-                  value={password}
-                  onChange={e => setPassword(e.target.value)}
-                  required
-                />
-              </div>
-
-              <div>
-                <label htmlFor="radius-plano" className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">Vincular Plano (Opcional)</label>
-                <select
-                  id="radius-plano"
-                  className="w-full px-4 py-2.5 bg-[#0d1117] border border-gray-800/60 text-white rounded-xl focus:outline-none focus:border-emerald-500/50 text-xs transition-all focus:ring-1 focus:ring-emerald-500/30 cursor-pointer"
-                  value={planoSelecionado}
-                  onChange={e => setPlanoSelecionado(e.target.value)}
-                >
-                  <option value="" className="bg-[#121420]">Selecione um plano...</option>
-                  {planos.map(plano => (
-                    <option key={plano.id} value={plano.id} className="bg-[#121420]">
-                      {plano.nome} (Duração: {plano.duracao_minutos} min)
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="flex justify-end gap-2 pt-4 border-t border-gray-800/40">
+              <div className="modal-footer">
                 <button
                   type="button"
                   onClick={() => setMostrarModal(false)}
-                  className="px-4 py-2 bg-transparent hover:bg-gray-900 border border-gray-800 text-gray-300 text-xs font-semibold rounded-xl transition-colors"
+                  className="px-4 py-2 bg-transparent hover:bg-gray-900 border border-gray-800 text-gray-300 text-xs font-semibold rounded-xl transition-colors cursor-pointer"
                 >
                   Cancelar
                 </button>
                 <button
                   type="submit"
-                  className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-semibold text-xs py-2 px-4 rounded-xl shadow-lg hover:shadow-xl transition-all"
+                  className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-semibold text-xs py-2 px-4 rounded-xl shadow-lg hover:shadow-xl transition-all cursor-pointer"
                 >
                   Salvar Usuário
                 </button>
               </div>
             </form>
-
-            {status && (
-              <p className={`text-xs mt-3 text-center font-medium ${
-                status.includes('sucesso') ? 'text-emerald-400' : 'text-amber-400'
-              }`}>
-                {status}
-              </p>
-            )}
           </div>
         </div>
       )}

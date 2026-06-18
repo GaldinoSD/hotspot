@@ -10,7 +10,7 @@
  * @param {string} password - Senha (geralmente igual ao username)
  * @param {number} delayMs - Delay opcional antes do redirect (ms)
  */
-export function redirecionarHotspot(gateway, username, password, delayMs = 0) {
+export function redirecionarHotspot(gateway, username, password, delayMs = 0, redirectOpts = {}) {
   if (!gateway || !username) {
     console.error("redirecionarHotspot: gateway ou username vazios", { gateway, username });
     return;
@@ -25,7 +25,23 @@ export function redirecionarHotspot(gateway, username, password, delayMs = 0) {
     url = url.replace(/\/$/, "") + "/login";
   }
 
-  const finalUrl = `${url}?username=${encodeURIComponent(username)}&password=${encodeURIComponent(password || username)}`;
+  let finalUrl = `${url}?username=${encodeURIComponent(username)}&password=${encodeURIComponent(password || username)}`;
+
+  if (redirectOpts.cfg) {
+    const action = redirectOpts.cfg.post_login_action || "status";
+    if (action === "redirect" && redirectOpts.cfg.post_login_redirect_url) {
+      let target = redirectOpts.cfg.post_login_redirect_url.trim();
+      if (!target.startsWith("http://") && !target.startsWith("https://")) {
+        target = `http://${target}`;
+      }
+      finalUrl += `&dst=${encodeURIComponent(target)}`;
+    } else if (action === "status" && redirectOpts.mikrotikId) {
+      const systemDomain = window.location.host;
+      const protocol = (systemDomain.includes("localhost") || systemDomain.match(/^\d+\.\d+\.\d+\.\d+$/)) ? "http" : "https";
+      const dst = `${protocol}://${systemDomain}/api/hotspot-status/redirect/${redirectOpts.mikrotikId}?mac=${encodeURIComponent(redirectOpts.mac || '')}&ip=${encodeURIComponent(redirectOpts.ip || '')}&username=${encodeURIComponent(username)}`;
+      finalUrl += `&dst=${encodeURIComponent(dst)}`;
+    }
+  }
 
   const doRedirect = () => {
     window.location.href = finalUrl;

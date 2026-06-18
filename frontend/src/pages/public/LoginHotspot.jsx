@@ -58,7 +58,7 @@ export default function LoginHotspot() {
       setMensagem("Autenticado! Conectando à internet...");
 
       if (data.gateway && data.username) {
-        redirecionarHotspot(data.gateway, data.username, form.password, 1500);
+        redirecionarHotspot(data.gateway, data.username, form.password, 1500, { cfg, mac: form.mac, ip: form.ip, mikrotikId });
       }
     } catch (err) {
       setErro(err.message);

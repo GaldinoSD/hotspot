@@ -362,7 +362,9 @@ async function limparLogs(req, res) {
 
     let sql = "DELETE FROM whatsapp_logs WHERE empresa_id = ?";
     const params = [empresaId];
-    if (antes_de) {
+    
+    // Filtra por data apenas se o parâmetro antes_de for válido e preenchido
+    if (antes_de && antes_de !== "undefined" && antes_de.trim() !== "") {
       sql += " AND criado_em < ?";
       params.push(antes_de);
     }

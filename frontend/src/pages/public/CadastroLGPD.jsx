@@ -83,7 +83,7 @@ export default function CadastroLGPD() {
       setMensagem("Cadastro realizado! Conectando...");
 
       if (data.gateway && data.username) {
-        redirecionarHotspot(data.gateway, data.username, data.password, 1500);
+        redirecionarHotspot(data.gateway, data.username, data.password, 1500, { cfg, mac: form.mac, ip: form.ip, mikrotikId });
       }
     } catch (err) {
       setMensagem(err.message);

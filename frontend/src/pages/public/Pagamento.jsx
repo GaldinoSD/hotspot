@@ -7,6 +7,14 @@ export default function Pagamento() {
   const [searchParams] = useSearchParams();
   const [plano, setPlano] = useState(null);
   const [metodo, setMetodo] = useState(null); // null = escolha, "pix" ou "cartao"
+  const [cfg, setCfg] = useState({});
+
+  useEffect(() => {
+    if (empresaId) {
+      fetch(`/api/portal-config/planos?empresa_id=${empresaId}`)
+        .then(r => r.json()).then(setCfg).catch(() => {});
+    }
+  }, [empresaId]);
 
   // PIX state
   const [qrCode, setQrCode] = useState(null);
@@ -184,7 +192,7 @@ export default function Pagamento() {
         const data = await res.json();
         if (data.status === "approved" && data.gateway && data.username) {
           setPagamentoAprovado(true);
-          redirecionarHotspot(data.gateway, data.username, data.password, 2000);
+          redirecionarHotspot(data.gateway, data.username, data.password, 2000, { cfg, mac, ip, mikrotikId });
         }
       } catch (err) {
         console.error("Erro ao verificar status:", err);
@@ -220,7 +228,7 @@ export default function Pagamento() {
           // para o cliente ter internet e conseguir abrir o app do banco.
           if (data.gateway && data.username) {
             setTimeout(() => {
-              redirecionarHotspot(data.gateway, data.username, data.password, 1500);
+              redirecionarHotspot(data.gateway, data.username, data.password, 1500, { cfg, mac, ip, mikrotikId });
             }, 2000); // 2s pro usuario ler a mensagem antes de redirecionar
           }
         }
@@ -308,7 +316,7 @@ export default function Pagamento() {
 
       if (data.status === "approved" && data.gateway && data.username) {
         setPagamentoAprovado(true);
-        redirecionarHotspot(data.gateway, data.username, data.password, 2000);
+        redirecionarHotspot(data.gateway, data.username, data.password, 2000, { cfg, mac, ip, mikrotikId });
         return;
       }
       if (data.status === "pending") {

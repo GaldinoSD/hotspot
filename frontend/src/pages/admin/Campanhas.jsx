@@ -235,48 +235,63 @@ export default function Campanhas() {
 
       {/* Modal Criar Campanha */}
       {showModal && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fadeIn">
-          <div className="bg-[#131722] rounded-xl border border-slate-800 w-full max-w-md p-6 shadow-2xl relative animate-scaleIn">
-            <h3 className="text-lg font-bold text-slate-100 mb-5 flex items-center gap-2">
-              <Megaphone className="w-5 h-5 text-orange-500" />
-              Nova Campanha
-            </h3>
-            <form className="space-y-4" onSubmit={handleCriar}>
-              <div>
-                <label className="block text-slate-400 text-xs font-semibold uppercase tracking-wider mb-2">
-                  Nome <span className="text-red-400">*</span>
-                </label>
-                <input
-                  type="text"
-                  placeholder="Nome identificador da campanha"
-                  className="w-full bg-[#090b11] border border-slate-800 text-white rounded-lg px-3.5 py-2.5 outline-none focus:border-orange-500 transition-all placeholder-slate-600 text-sm font-sans"
-                  value={form.nome}
-                  onChange={(e) => setForm({ ...form, nome: e.target.value })}
-                  required
-                />
+        <div className="modal-overlay">
+          <div className="modal-container max-w-md">
+            <div className="modal-header">
+              <h3 className="modal-title">
+                <Megaphone className="w-5 h-5 text-orange-500" />
+                Nova Campanha
+              </h3>
+              <button 
+                type="button"
+                onClick={() => setShowModal(false)} 
+                className="modal-close-btn"
+                title="Fechar"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            
+            <form onSubmit={handleCriar} className="flex flex-col flex-1 overflow-hidden">
+              <div className="modal-body space-y-4">
+                <div>
+                  <label className="block text-slate-400 text-xs font-semibold uppercase tracking-wider mb-2">
+                    Nome <span className="text-red-400">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Nome identificador da campanha"
+                    className="w-full text-white rounded-lg px-3.5 py-2.5 outline-none transition-all placeholder-slate-600 text-sm font-sans"
+                    value={form.nome}
+                    onChange={(e) => setForm({ ...form, nome: e.target.value })}
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-slate-400 text-xs font-semibold uppercase tracking-wider mb-2">Descrição</label>
+                  <textarea
+                    placeholder="Onde essa campanha vai ser exibida ou qual o objetivo?"
+                    className="w-full text-white rounded-lg px-3.5 py-2.5 outline-none transition-all placeholder-slate-600 text-sm font-sans"
+                    rows={3}
+                    value={form.descricao}
+                    onChange={(e) => setForm({ ...form, descricao: e.target.value })}
+                  />
+                </div>
               </div>
-              <div>
-                <label className="block text-slate-400 text-xs font-semibold uppercase tracking-wider mb-2">Descrição</label>
-                <textarea
-                  placeholder="Onde essa campanha vai ser exibida ou qual o objetivo?"
-                  className="w-full bg-[#090b11] border border-slate-800 text-white rounded-lg px-3.5 py-2.5 outline-none focus:border-orange-500 transition-all placeholder-slate-600 text-sm font-sans"
-                  rows={3}
-                  value={form.descricao}
-                  onChange={(e) => setForm({ ...form, descricao: e.target.value })}
-                />
-              </div>
-              <div className="flex justify-end gap-3 pt-3">
+              <div className="modal-footer">
                 <button
                   type="button"
                   onClick={() => setShowModal(false)}
-                  className="px-4 py-2.5 rounded-lg border border-slate-800 hover:bg-slate-900 text-sm font-medium transition-colors text-slate-300"
+                  className="px-4 py-2.5 rounded-lg border border-slate-800 hover:bg-slate-900 text-sm font-medium transition-colors text-slate-300 cursor-pointer"
                 >
                   Cancelar
                 </button>
                 <button
                   type="submit"
                   disabled={salvando}
-                  className="px-4 py-2.5 rounded-lg bg-orange-600 hover:bg-orange-500 text-white text-sm font-semibold transition-all shadow-lg hover:shadow-orange-600/10 active:scale-95"
+                  className="px-4 py-2.5 rounded-lg bg-orange-600 hover:bg-orange-500 text-white text-sm font-semibold transition-all shadow-lg hover:shadow-orange-600/10 active:scale-95 cursor-pointer"
                 >
                   {salvando ? "Criando..." : "Criar"}
                 </button>

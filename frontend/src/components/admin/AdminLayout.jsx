@@ -9,6 +9,12 @@ export default function AdminLayout({ children }) {
   const { user, logout, isSuperAdmin, empresas, switchEmpresa, hasPermission } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
+
+  useEffect(() => {
+    localStorage.removeItem("theme");
+    document.documentElement.classList.remove("theme-light");
+  }, []);
   const [switchingEmpresa, setSwitchingEmpresa] = useState(false);
   const [empresaLogo, setEmpresaLogo] = useState(null);
   const [openMenus, setOpenMenus] = useState({});
@@ -98,6 +104,7 @@ export default function AdminLayout({ children }) {
       children: [
         { key: "mikrotiks", title: "Cadastro mikrotik", path: `${basePath}/mikrotiks` },
         { key: "vpn", title: "VPN Wireguard", path: `${basePath}/vpn` },
+        { key: "monitoramento", title: "Monitoramento", path: `${basePath}/monitoramento` },
       ]
     },
     {
@@ -246,10 +253,10 @@ export default function AdminLayout({ children }) {
           shadow-2xl lg:shadow-none
         `}
       >
-        {/* Logo Area - Centered */}
-        <div className={`sidebar-logo-area border-b border-gray-800 ${isCollapsed ? '!p-3' : ''}`}>
+        {/* Logo Area - Centered, matching the top header bar size */}
+        <div className={`sidebar-logo-area border-b border-gray-800 !py-3 h-[65px] flex items-center justify-center ${isCollapsed ? '!p-3' : ''}`}>
           {!isCollapsed ? (
-            <img src={empresaLogo || '/logo-forum.jpg'} alt="Logo" className="h-14 w-auto max-w-[160px] object-contain" />
+            <img src={empresaLogo || '/logo-forum.jpg'} alt="Logo" className="h-10 w-auto max-w-[160px] object-contain" />
           ) : (
             <img src={empresaLogo || '/logo-forum.jpg'} alt="Logo" className="h-9 w-9 object-contain rounded-lg" />
           )}
@@ -264,55 +271,7 @@ export default function AdminLayout({ children }) {
           </button>
         </div>
 
-        {/* User Info Card */}
-        {!isCollapsed && (
-          <div className="sidebar-user-card">
-            <div className="sidebar-user-info">
-              <div className="sidebar-user-avatar">
-                {(user?.nome || user?.email || '?').substring(0, 2)}
-              </div>
-              <div className="sidebar-user-details">
-                <div className="flex items-center gap-1.5 flex-wrap">
-                  <div className="sidebar-user-name">{user?.nome || user?.email}</div>
-                  {user?.role && (
-                    <span className="sidebar-role-badge">
-                      {user.role}
-                    </span>
-                  )}
-                </div>
-                {user?.nome && <div className="sidebar-user-email">{user?.email}</div>}
-              </div>
-            </div>
-            {empresas.length > 1 ? (
-              <select
-                value={user?.empresa_id || ''}
-                disabled={switchingEmpresa}
-                onChange={async (e) => {
-                  const newId = parseInt(e.target.value);
-                  if (newId === user?.empresa_id) return;
-                  setSwitchingEmpresa(true);
-                  try {
-                    const emp = await switchEmpresa(newId);
-                    window.location.href = `/admin/${emp.slug}`;
-                  } catch (err) {
-                    alert('Erro ao trocar empresa');
-                  } finally {
-                    setSwitchingEmpresa(false);
-                  }
-                }}
-                className="sidebar-empresa-select"
-              >
-                {empresas.map(e => (
-                  <option key={e.id} value={e.id}>{e.nome}</option>
-                ))}
-              </select>
-            ) : (
-              <div className="sidebar-empresa-name">
-                {user?.empresa_nome || 'Empresa'}
-              </div>
-            )}
-          </div>
-        )}
+        {/* User Info Card removed from sidebar as it was moved to the header */}
 
         <nav className="flex-1 overflow-y-auto p-4 custom-scrollbar">
           <div className="space-y-1">
@@ -376,17 +335,6 @@ export default function AdminLayout({ children }) {
                 </Link>
               );
             })}
-
-            <button
-              onClick={handleLogout}
-              title={isCollapsed ? "Sair" : ""}
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg font-medium text-gray-400 hover:bg-red-900/20 hover:text-red-400 transition-all duration-200 mt-2 cursor-pointer ${isCollapsed ? 'justify-center px-0' : ''}`}
-            >
-              <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
-              </svg>
-              {!isCollapsed && <span className="text-sm">Sair</span>}
-            </button>
           </div>
         </nav>
 
@@ -429,18 +377,113 @@ export default function AdminLayout({ children }) {
       </aside>
 
       <div className="flex-1 flex flex-col h-full overflow-y-auto custom-scrollbar">
-        <header className="lg:hidden bg-[#1a1d27] border-b border-gray-800 px-4 py-3 sticky top-0 z-10 flex-shrink-0">
-          <div className="flex items-center justify-between">
+        <header className="bg-[#1a1d27] border-b border-gray-800 px-6 py-3 sticky top-0 z-10 flex-shrink-0">
+          <div className="flex items-center justify-between relative">
             <button
               onClick={() => setSidebarOpen(true)}
-              className="p-2 rounded-lg hover:bg-gray-800 text-gray-400 cursor-pointer"
+              className="p-2 rounded-lg hover:bg-gray-800 text-gray-400 cursor-pointer lg:hidden"
             >
               <svg className="w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16"/>
               </svg>
             </button>
-            <img src="/logo-forum.jpg" alt="Logo" className="h-10 object-contain" />
-            <div className="w-10" />
+            
+            <img src="/logo-forum.jpg" alt="Logo" className="h-10 object-contain lg:hidden" />
+            
+            <div className="hidden lg:block" />
+
+            <div className="flex items-center gap-3">
+              <div className="relative">
+              <button
+                onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
+                className="flex items-center gap-2.5 p-1 rounded-lg hover:bg-gray-800/50 transition-all duration-200 cursor-pointer select-none"
+              >
+                <div className="hidden sm:flex flex-col text-right">
+                  <span className="text-xs font-semibold text-gray-200 truncate max-w-[150px]">
+                    {user?.nome || user?.email}
+                  </span>
+                  <span className="text-[10px] text-gray-400">
+                    {user?.empresa_nome || 'Empresa'}
+                  </span>
+                </div>
+                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center text-xs font-bold text-white uppercase select-none">
+                  {(user?.nome || user?.email || '?').substring(0, 2)}
+                </div>
+                <svg className={`w-4 h-4 text-gray-400 transition-transform duration-200 ${profileDropdownOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+
+              {profileDropdownOpen && (
+                <>
+                  <div className="fixed inset-0 z-40" onClick={() => setProfileDropdownOpen(false)} />
+                  <div className="absolute right-0 mt-2 w-64 bg-[#1a1d27] border border-gray-800 rounded-lg shadow-2xl p-4 z-50 animate-fade-in">
+                    <div className="flex items-center gap-3 mb-3 pb-3 border-b border-gray-800/60">
+                      <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center text-sm font-bold text-white uppercase">
+                        {(user?.nome || user?.email || '?').substring(0, 2)}
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          <span className="text-xs font-semibold text-gray-200 truncate max-w-[120px]">{user?.nome || user?.email}</span>
+                          {user?.role && (
+                            <span className="px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider rounded bg-blue-900/40 text-blue-400 border border-blue-800/30">
+                              {user.role}
+                            </span>
+                          )}
+                        </div>
+                        <span className="text-[10px] text-gray-500 truncate block">{user?.email}</span>
+                      </div>
+                    </div>
+
+                    <div className="mb-3">
+                      <label className="text-[10px] font-bold text-gray-500 uppercase tracking-wider block mb-1">Empresa activa</label>
+                      {empresas.length > 1 ? (
+                        <select
+                          value={user?.empresa_id || ''}
+                          disabled={switchingEmpresa}
+                          onChange={async (e) => {
+                            const newId = parseInt(e.target.value);
+                            if (newId === user?.empresa_id) return;
+                            setSwitchingEmpresa(true);
+                            try {
+                              const emp = await switchEmpresa(newId);
+                              window.location.href = `/admin/${emp.slug}`;
+                            } catch (err) {
+                              alert('Erro ao trocar empresa');
+                            } finally {
+                              setSwitchingEmpresa(false);
+                            }
+                          }}
+                          className="w-full bg-[#0f172a] border border-gray-800 text-gray-300 text-xs rounded-lg px-2.5 py-1.5 outline-none focus:border-blue-500 transition-colors"
+                        >
+                          {empresas.map(e => (
+                            <option key={e.id} value={e.id}>{e.nome}</option>
+                          ))}
+                        </select>
+                      ) : (
+                        <div className="flex items-center gap-1.5 text-xs text-gray-400 px-1 py-0.5">
+                          <span className="w-2 h-2 rounded-full bg-green-500"></span>
+                          <span className="font-medium">{user?.empresa_nome || 'Empresa'}</span>
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="border-t border-gray-800/60 pt-2">
+                      <button
+                        onClick={handleLogout}
+                        className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium text-gray-400 hover:bg-red-900/20 hover:text-red-400 transition-colors cursor-pointer"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                        </svg>
+                        Sair da conta
+                      </button>
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
           </div>
         </header>
 

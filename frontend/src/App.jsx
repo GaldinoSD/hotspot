@@ -3,6 +3,7 @@ import { useAuth } from "./contexts/AuthContext";
 import Login from "./pages/admin/Login";
 import Dashboard from "./pages/admin/Dashboard";
 import Mikrotiks from "./pages/admin/Mikrotiks";
+import Monitoramento from "./pages/admin/Monitoramento";
 import Planos from "./pages/admin/Planos";
 import Configuracoes from "./pages/admin/Configuracoes";
 import Pagamentos from "./pages/admin/Pagamentos";
@@ -78,6 +79,7 @@ function App() {
       <Route path="/admin/:empresaSlug" element={<RotaPrivada><Dashboard /></RotaPrivada>} />
       <Route path="/admin/:empresaSlug/empresas" element={<RotaPrivada><EmpresasAdmin /></RotaPrivada>} />
       <Route path="/admin/:empresaSlug/mikrotiks" element={<RotaPrivada><Mikrotiks /></RotaPrivada>} />
+      <Route path="/admin/:empresaSlug/monitoramento" element={<RotaPrivada><Monitoramento /></RotaPrivada>} />
       <Route path="/admin/:empresaSlug/vpn" element={<RotaPrivada><Wireguard /></RotaPrivada>} />
       <Route path="/admin/:empresaSlug/portais" element={<RotaPrivada><Portais /></RotaPrivada>} />
       <Route path="/admin/:empresaSlug/portais/:portalId/editor" element={<RotaPrivada><PortalEditor /></RotaPrivada>} />

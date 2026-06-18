@@ -5,34 +5,59 @@ const { notificarLiberacao } = require("../services/whatsappNotify");
 
 async function obterInformacoes(req, res) {
   const { id } = req.params;
+  let conn;
 
   try {
     const [[mikrotik]] = await db.execute("SELECT * FROM mikrotiks WHERE id = ? AND empresa_id = ?", [id, req.empresa_id]);
     if (!mikrotik) return res.status(404).json({ message: "Mikrotik não encontrado" });
 
-    const conn = new RouterOSAPI({
+    conn = new RouterOSAPI({
       host: mikrotik.ip,
       user: mikrotik.usuario,
       password: mikrotik.senha,
       port: mikrotik.porta || 8728,
       keepalive: false,
-      timeout: 5000,
+      timeout: 4000,
     });
 
     await conn.connect();
 
     const [resource] = await conn.write("/system/resource/print");
+
+    const timedQuery = (path, timeoutMs = 2000) => {
+      return Promise.race([
+        conn.write(path).then(r => Array.isArray(r) ? r : []).catch(() => []),
+        new Promise(resolve => setTimeout(() => resolve([]), timeoutMs))
+      ]);
+    };
+
+    const activeList = await timedQuery("/ip/hotspot/active/print", 2000);
+    
     await conn.close();
 
+    const totalMem = parseInt(resource["total-memory"]) || 0;
+    const freeMem = parseInt(resource["free-memory"]) || 0;
+
     return res.json({
+      status: "online",
       modelo: resource["board-name"] || "Desconhecido",
       versao: resource.version || "N/A",
       uptime: resource.uptime || "N/A",
       cpu: resource["cpu"] || "N/A",
+      cpuLoad: parseInt(resource["cpu-load"]) || 0,
+      totalMemory: totalMem,
+      freeMemory: freeMem,
+      activeUsers: activeList.length
     });
   } catch (err) {
-    console.error("Erro ao obter informações do Mikrotik:", err.message);
-    return res.status(500).json({ message: "Falha na conexão com o Mikrotik" });
+    console.error(`[obterInformacoes] Erro no Mikrotik ID ${id}:`, err.message);
+    if (conn) {
+      try { await conn.close(); } catch (e) {}
+    }
+    return res.json({
+      status: "offline",
+      message: err.message || "Falha na conexão com o Mikrotik"
+    });
   }
 }
 

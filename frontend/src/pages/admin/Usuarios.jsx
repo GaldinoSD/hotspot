@@ -226,65 +226,81 @@ export default function Usuarios() {
 
       {/* Modal Criar/Editar */}
       {showModal && (
-        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fadeIn">
-          <div className="bg-[#131722] rounded-xl border border-slate-800 p-6 w-full max-w-md shadow-2xl relative animate-scaleIn">
-            <h2 className="text-lg font-bold text-slate-100 mb-5 flex items-center gap-2">
-              <ShieldAlert className="w-5 h-5 text-orange-500" />
-              {editando ? "Editar Administrador" : "Criar Administrador"}
-            </h2>
-            <form className="space-y-4" onSubmit={handleSubmit}>
-              <div>
-                <label className="block text-slate-400 text-xs font-semibold uppercase tracking-wider mb-2">
-                  E-mail
-                </label>
-                <div className="relative">
-                  <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-500">
-                    <Mail className="w-4 h-4" />
-                  </span>
-                  <input
-                    type="email"
-                    required
-                    placeholder="exemplo@email.com"
-                    className="w-full bg-[#090b11] border border-slate-800 text-white rounded-lg pl-10 pr-3.5 py-2.5 outline-none focus:border-orange-500 transition-all placeholder-slate-600 text-sm font-sans"
-                    value={form.email}
-                    onChange={(e) => setForm({ ...form, email: e.target.value })}
-                  />
-                </div>
-              </div>
-              <div>
-                <label className="block text-slate-400 text-xs font-semibold uppercase tracking-wider mb-2 flex items-center justify-between">
-                  <span>Senha</span>
-                  {editando && (
-                    <span className="text-[10px] text-slate-500 normal-case font-normal">
-                      (deixe em branco para manter)
+        <div className="modal-overlay">
+          <div className="modal-container max-w-md">
+            <div className="modal-header">
+              <h3 className="modal-title">
+                <ShieldAlert className="w-5 h-5 text-orange-500" />
+                {editando ? "Editar Administrador" : "Criar Administrador"}
+              </h3>
+              <button 
+                type="button"
+                onClick={() => setShowModal(false)} 
+                className="modal-close-btn"
+                title="Fechar"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            
+            <form onSubmit={handleSubmit} className="flex flex-col flex-1 overflow-hidden">
+              <div className="modal-body space-y-4">
+                <div>
+                  <label className="block text-slate-400 text-xs font-semibold uppercase tracking-wider mb-2">
+                    E-mail
+                  </label>
+                  <div className="relative">
+                    <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-500">
+                      <Mail className="w-4 h-4" />
                     </span>
-                  )}
-                </label>
-                <div className="relative">
-                  <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-500">
-                    <KeyRound className="w-4 h-4" />
-                  </span>
-                  <input
-                    type="password"
-                    required={!editando}
-                    placeholder="••••••••"
-                    className="w-full bg-[#090b11] border border-slate-800 text-white rounded-lg pl-10 pr-3.5 py-2.5 outline-none focus:border-orange-500 transition-all placeholder-slate-600 text-sm font-sans"
-                    value={form.senha}
-                    onChange={(e) => setForm({ ...form, senha: e.target.value })}
-                  />
+                    <input
+                      type="email"
+                      required
+                      placeholder="exemplo@email.com"
+                      className="w-full text-white rounded-lg pl-10 pr-3.5 py-2.5 outline-none transition-all placeholder-slate-600 text-sm font-sans"
+                      value={form.email}
+                      onChange={(e) => setForm({ ...form, email: e.target.value })}
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-slate-400 text-xs font-semibold uppercase tracking-wider mb-2 flex items-center justify-between">
+                    <span>Senha</span>
+                    {editando && (
+                      <span className="text-[10px] text-slate-500 normal-case font-normal">
+                        (deixe em branco para manter)
+                      </span>
+                    )}
+                  </label>
+                  <div className="relative">
+                    <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-500">
+                      <KeyRound className="w-4 h-4" />
+                    </span>
+                    <input
+                      type="password"
+                      required={!editando}
+                      placeholder="••••••••"
+                      className="w-full text-white rounded-lg pl-10 pr-3.5 py-2.5 outline-none transition-all placeholder-slate-600 text-sm font-sans"
+                      value={form.senha}
+                      onChange={(e) => setForm({ ...form, senha: e.target.value })}
+                    />
+                  </div>
                 </div>
               </div>
-              <div className="flex justify-end gap-3 pt-3">
+              
+              <div className="modal-footer">
                 <button
                   type="button"
                   onClick={() => setShowModal(false)}
-                  className="px-4 py-2.5 rounded-lg border border-slate-800 hover:bg-slate-900 text-sm font-medium transition-colors text-slate-300"
+                  className="px-4 py-2.5 rounded-lg border border-slate-800 hover:bg-slate-900 text-sm font-medium transition-colors text-slate-300 cursor-pointer"
                 >
                   Cancelar
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2.5 rounded-lg bg-orange-600 hover:bg-orange-500 text-white text-sm font-semibold transition-all shadow-lg hover:shadow-orange-600/10 active:scale-95"
+                  className="px-4 py-2.5 rounded-lg bg-orange-600 hover:bg-orange-500 text-white text-sm font-semibold transition-all shadow-lg hover:shadow-orange-600/10 active:scale-95 cursor-pointer"
                 >
                   Salvar
                 </button>

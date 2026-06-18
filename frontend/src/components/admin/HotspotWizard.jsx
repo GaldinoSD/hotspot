@@ -78,39 +78,48 @@ export default function HotspotWizard({ isOpen, onClose }) {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4">
-      <div className="bg-[#1a1d27] border border-gray-700 rounded-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+    <div className="modal-overlay">
+      <div className="modal-container max-w-2xl">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-700">
-          <h2 className="text-xl font-bold text-white">Wizard de Hotspot</h2>
-          <button onClick={onClose} className="text-gray-400 hover:text-white text-2xl">&times;</button>
+        <div className="modal-header">
+          <h3 className="modal-title">
+            <svg className="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+            </svg>
+            Wizard de Hotspot
+          </h3>
+          <button onClick={onClose} className="modal-close-btn" title="Fechar">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
         </div>
 
         {/* Step indicators */}
-        <div className="flex items-center px-6 pt-4 gap-2 overflow-x-auto">
+        <div className="flex items-center px-6 py-4 gap-2 border-b border-gray-800/40 bg-[#10121b]/40 overflow-x-auto shrink-0 custom-scrollbar">
           {STEPS.map((step, i) => (
             <div key={i} className="flex items-center">
-              <div className={`flex items-center justify-center w-8 h-8 rounded-full text-sm font-bold shrink-0 ${
-                i === currentStep ? "bg-blue-600 text-white" :
-                i < currentStep ? "bg-green-600 text-white" :
-                "bg-gray-700 text-gray-400"
+              <div className={`flex items-center justify-center w-7 h-7 rounded-full text-xs font-bold shrink-0 ${
+                i === currentStep ? "bg-emerald-600 text-white" :
+                i < currentStep ? "bg-emerald-950/60 text-emerald-400 border border-emerald-900/30" :
+                "bg-gray-950/60 text-gray-500 border border-gray-900/30"
               }`}>
                 {i < currentStep ? "\u2713" : i + 1}
               </div>
-              <span className={`ml-1 text-xs whitespace-nowrap ${i === currentStep ? "text-white" : "text-gray-500"}`}>
+              <span className={`ml-1.5 text-[10px] font-bold uppercase tracking-wider whitespace-nowrap ${i === currentStep ? "text-white" : "text-gray-500"}`}>
                 {step}
               </span>
-              {i < STEPS.length - 1 && <div className="w-4 h-px bg-gray-600 mx-1" />}
+              {i < STEPS.length - 1 && <div className="w-4 h-px bg-[#26293c] mx-2 shrink-0" />}
             </div>
           ))}
         </div>
 
         {/* Content */}
-        <div className="p-6 space-y-4">
+        <div className="modal-body space-y-4">
           {/* Step 0: Select MikroTik */}
           {currentStep === 0 && (
             <div>
-              <label className="block text-gray-300 mb-2">Selecione o MikroTik</label>
+              <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">Selecione o MikroTik</label>
               <select
                 value={selectedMikrotik?.id || ""}
                 onChange={(e) => {
@@ -118,7 +127,7 @@ export default function HotspotWizard({ isOpen, onClose }) {
                   setSelectedMikrotik(mk || null);
                   setConfig(c => ({ ...c, radiusSecret: mk?.senha || "" }));
                 }}
-                className="w-full p-2 bg-[#0d1117] border border-gray-700 text-white rounded focus:outline-none focus:border-blue-500"
+                className="w-full px-4 py-2.5 text-white rounded-xl focus:outline-none text-xs transition-all cursor-pointer"
               >
                 <option value="">-- Selecione --</option>
                 {mikrotiks.map(mk => (
@@ -126,7 +135,7 @@ export default function HotspotWizard({ isOpen, onClose }) {
                 ))}
               </select>
               {selectedMikrotik && (
-                <div className="mt-3 p-3 bg-[#0d1117] rounded border border-gray-700 text-sm text-gray-300">
+                <div className="mt-3 p-3.5 bg-[#0f1017] rounded-xl border border-gray-800 text-xs text-gray-300 font-mono space-y-1">
                   <p>IP: {selectedMikrotik.ip}</p>
                   <p>Porta: {selectedMikrotik.porta || 8728}</p>
                 </div>
@@ -136,41 +145,41 @@ export default function HotspotWizard({ isOpen, onClose }) {
 
           {/* Step 1: Scan Network */}
           {currentStep === 1 && (
-            <div>
+            <div className="space-y-4">
               <button
                 onClick={handleScan}
                 disabled={scanning}
-                className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-500 disabled:opacity-50"
+                className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-semibold text-xs py-2 px-4 rounded-xl shadow-lg hover:shadow-xl transition-all cursor-pointer"
               >
                 {scanning ? "Escaneando..." : "Escanear Rede"}
               </button>
               {scanResult && scanResult.error && (
-                <div className="mt-3 p-3 bg-red-900/30 border border-red-700 rounded text-red-300 text-sm">
+                <div className="p-3 bg-red-950/20 border border-red-900/30 rounded-xl text-red-400 text-xs font-semibold">
                   {scanResult.error}
                 </div>
               )}
               {scanResult && !scanResult.error && (
-                <div className="mt-3 space-y-3">
+                <div className="space-y-3">
                   <div>
-                    <h4 className="text-gray-300 font-medium mb-1">Interfaces ({scanResult.interfaces?.length || 0})</h4>
-                    <div className="bg-[#0d1117] rounded border border-gray-700 max-h-40 overflow-y-auto">
+                    <h4 className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">Interfaces ({scanResult.interfaces?.length || 0})</h4>
+                    <div className="bg-[#0f1017] rounded-xl border border-gray-800 max-h-40 overflow-y-auto custom-scrollbar divide-y divide-gray-800/40">
                       {(scanResult.interfaces || []).map((iface, i) => (
-                        <div key={i} className="px-3 py-1 text-sm text-gray-300 border-b border-gray-800 last:border-0">
+                        <div key={i} className="px-3.5 py-2 text-xs text-gray-300">
                           {iface.name || iface.defaultName} {iface.type ? `(${iface.type})` : ""} {iface.running === "true" ? " - UP" : ""}
                         </div>
                       ))}
                     </div>
                   </div>
                   <div>
-                    <h4 className="text-gray-300 font-medium mb-1">Pools ({scanResult.pools?.length || 0})</h4>
-                    <div className="bg-[#0d1117] rounded border border-gray-700 max-h-40 overflow-y-auto">
+                    <h4 className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">Pools ({scanResult.pools?.length || 0})</h4>
+                    <div className="bg-[#0f1017] rounded-xl border border-gray-800 max-h-40 overflow-y-auto custom-scrollbar divide-y divide-gray-800/40">
                       {(scanResult.pools || []).map((pool, i) => (
-                        <div key={i} className="px-3 py-1 text-sm text-gray-300 border-b border-gray-800 last:border-0">
+                        <div key={i} className="px-3.5 py-2 text-xs text-gray-300">
                           {pool.name}: {pool.ranges}
                         </div>
                       ))}
                       {(!scanResult.pools || scanResult.pools.length === 0) && (
-                        <div className="px-3 py-1 text-sm text-gray-500">Nenhum pool encontrado</div>
+                        <div className="px-3.5 py-2.5 text-xs text-gray-500 italic">Nenhum pool encontrado</div>
                       )}
                     </div>
                   </div>
@@ -181,13 +190,13 @@ export default function HotspotWizard({ isOpen, onClose }) {
 
           {/* Step 2: Interface and IP Settings */}
           {currentStep === 2 && (
-            <div className="space-y-3">
+            <div className="space-y-4">
               <div>
-                <label className="block text-gray-300 mb-1">Interface</label>
+                <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">Interface</label>
                 <select
                   value={config.interface}
                   onChange={(e) => setConfig({ ...config, interface: e.target.value })}
-                  className="w-full p-2 bg-[#0d1117] border border-gray-700 text-white rounded focus:outline-none focus:border-blue-500"
+                  className="w-full px-4 py-2.5 text-white rounded-xl focus:outline-none text-xs transition-all cursor-pointer"
                 >
                   {(scanResult?.interfaces || []).map((iface, i) => (
                     <option key={i} value={iface.name || iface.defaultName}>
@@ -197,39 +206,39 @@ export default function HotspotWizard({ isOpen, onClose }) {
                 </select>
               </div>
               <div>
-                <label className="block text-gray-300 mb-1">Endereço Local (CIDR)</label>
+                <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">Endereço Local (CIDR)</label>
                 <input
                   type="text"
                   value={config.localAddress}
                   onChange={(e) => setConfig({ ...config, localAddress: e.target.value })}
-                  className="w-full p-2 bg-[#0d1117] border border-gray-700 text-white rounded focus:outline-none focus:border-blue-500"
+                  className="w-full px-4 py-2.5 text-white rounded-xl focus:outline-none text-xs transition-all font-mono"
                 />
               </div>
               <div>
-                <label className="block text-gray-300 mb-1">Nome do Pool</label>
+                <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">Nome do Pool</label>
                 <input
                   type="text"
                   value={config.poolName}
                   onChange={(e) => setConfig({ ...config, poolName: e.target.value })}
-                  className="w-full p-2 bg-[#0d1117] border border-gray-700 text-white rounded focus:outline-none focus:border-blue-500"
+                  className="w-full px-4 py-2.5 text-white rounded-xl focus:outline-none text-xs transition-all"
                 />
               </div>
               <div>
-                <label className="block text-gray-300 mb-1">Range do Pool</label>
+                <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">Range do Pool</label>
                 <input
                   type="text"
                   value={config.poolRange}
                   onChange={(e) => setConfig({ ...config, poolRange: e.target.value })}
-                  className="w-full p-2 bg-[#0d1117] border border-gray-700 text-white rounded focus:outline-none focus:border-blue-500"
+                  className="w-full px-4 py-2.5 text-white rounded-xl focus:outline-none text-xs transition-all font-mono"
                 />
               </div>
               <div>
-                <label className="block text-gray-300 mb-1">DNS Name (opcional)</label>
+                <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">DNS Name (opcional)</label>
                 <input
                   type="text"
                   value={config.dnsName}
                   onChange={(e) => setConfig({ ...config, dnsName: e.target.value })}
-                  className="w-full p-2 bg-[#0d1117] border border-gray-700 text-white rounded focus:outline-none focus:border-blue-500"
+                  className="w-full px-4 py-2.5 text-white rounded-xl focus:outline-none text-xs transition-all"
                   placeholder="hotspot.meudominio.com"
                 />
               </div>
@@ -238,51 +247,51 @@ export default function HotspotWizard({ isOpen, onClose }) {
 
           {/* Step 3: RADIUS Configuration */}
           {currentStep === 3 && (
-            <div className="space-y-3">
-              <div className="p-4 bg-[#0d1117] rounded border border-gray-700">
-                <h4 className="text-gray-300 font-medium mb-3">Configuração RADIUS</h4>
-                <div className="space-y-2">
+            <div className="space-y-4">
+              <div className="p-4 bg-[#0f1017] rounded-xl border border-gray-800">
+                <h4 className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-3">Configuração RADIUS</h4>
+                <div className="space-y-3">
                   <div>
-                    <label className="block text-gray-400 text-sm mb-1">Servidor RADIUS IP</label>
+                    <label className="block text-gray-400 text-xs mb-1.5">Servidor RADIUS IP</label>
                     <input
                       type="text"
                       value={config.radiusServerIp}
                       onChange={(e) => setConfig({ ...config, radiusServerIp: e.target.value })}
-                      className="w-full p-2 bg-[#161b22] border border-gray-700 text-white rounded focus:outline-none focus:border-blue-500"
+                      className="w-full px-4 py-2.5 text-white rounded-xl focus:outline-none text-xs transition-all font-mono"
                     />
                   </div>
                   <div>
-                    <label className="block text-gray-400 text-sm mb-1">Porta</label>
+                    <label className="block text-gray-400 text-xs mb-1.5">Porta</label>
                     <input
                       type="number"
                       value={config.radiusPort}
                       onChange={(e) => setConfig({ ...config, radiusPort: parseInt(e.target.value) || 1812 })}
-                      className="w-full p-2 bg-[#161b22] border border-gray-700 text-white rounded focus:outline-none focus:border-blue-500"
+                      className="w-full px-4 py-2.5 text-white rounded-xl focus:outline-none text-xs transition-all font-mono"
                     />
                   </div>
                   <div>
-                    <label className="block text-gray-400 text-sm mb-1">Secret</label>
+                    <label className="block text-gray-400 text-xs mb-1.5">Secret</label>
                     <input
                       type="text"
                       value={config.radiusSecret}
                       onChange={(e) => setConfig({ ...config, radiusSecret: e.target.value })}
-                      className="w-full p-2 bg-[#161b22] border border-gray-700 text-white rounded focus:outline-none focus:border-blue-500"
+                      className="w-full px-4 py-2.5 text-white rounded-xl focus:outline-none text-xs transition-all"
                       placeholder="Senha do MikroTik"
                     />
                   </div>
                 </div>
               </div>
-              <p className="text-gray-500 text-sm">
-                O RADIUS sera configurado no MikroTik para apontar para o servidor acima.
-                Para VPN, use o IP do tunnel (ex: 10.8.0.1).
+              <p className="text-gray-500 text-[10px] leading-relaxed">
+                O RADIUS será configurado no MikroTik para apontar para o servidor acima.
+                Para VPN, use o IP do túnel (ex: 10.8.0.1).
               </p>
             </div>
           )}
 
           {/* Step 4: Deploy */}
           {currentStep === 4 && (
-            <div>
-              <div className="mb-4 p-4 bg-[#0d1117] rounded border border-gray-700 text-sm text-gray-300 space-y-1">
+            <div className="space-y-4">
+              <div className="p-4 bg-[#0f1017] rounded-xl border border-gray-800 text-xs text-gray-300 font-mono space-y-1.5">
                 <p><strong>MikroTik:</strong> {selectedMikrotik?.nome || selectedMikrotik?.ip}</p>
                 <p><strong>Interface:</strong> {config.interface}</p>
                 <p><strong>IP:</strong> {config.localAddress}</p>
@@ -294,32 +303,34 @@ export default function HotspotWizard({ isOpen, onClose }) {
                 <button
                   onClick={handleDeploy}
                   disabled={deploying}
-                  className="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-500 disabled:opacity-50 font-medium"
+                  className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold text-xs py-2.5 px-6 rounded-xl shadow-lg hover:shadow-xl disabled:opacity-50 transition-all cursor-pointer"
                 >
                   {deploying ? "Deployando..." : "Iniciar Deploy"}
                 </button>
               )}
 
               {deployResult && (
-                <div className="mt-3">
-                  <div className={`p-3 rounded border mb-3 ${
+                <div className="space-y-3">
+                  <div className={`p-3.5 rounded-xl border text-xs font-semibold ${
                     deployResult.success
-                      ? "bg-green-900/30 border-green-700 text-green-300"
-                      : "bg-red-900/30 border-red-700 text-red-300"
+                      ? "bg-green-950/20 border-green-900/30 text-green-400"
+                      : "bg-red-955/20 border-red-900/30 text-red-400"
                   }`}>
-                    {deployResult.success ? "Deploy concluido com sucesso!" : `Erro: ${deployResult.error || "Falha no deploy"}`}
+                    {deployResult.success ? "Deploy concluído com sucesso!" : `Erro: ${deployResult.error || "Falha no deploy"}`}
                   </div>
-                  {(deployResult.steps || deployResult.log || []).map((item, i) => {
-                    const step = typeof item === "string" ? { message: item, status: "ok" } : item;
-                    return (
-                      <div key={i} className="flex items-center gap-2 text-sm py-1">
-                        <span className={step.status === "ok" ? "text-green-400" : "text-red-400"}>
-                          {step.status === "ok" ? "\u2713" : "\u2717"}
-                        </span>
-                        <span className="text-gray-300">{step.message}</span>
-                      </div>
-                    );
-                  })}
+                  <div className="space-y-1 max-h-40 overflow-y-auto custom-scrollbar">
+                    {(deployResult.steps || deployResult.log || []).map((item, i) => {
+                      const step = typeof item === "string" ? { message: item, status: "ok" } : item;
+                      return (
+                        <div key={i} className="flex items-center gap-2 text-xs py-1">
+                          <span className={step.status === "ok" ? "text-emerald-400" : "text-red-400 font-bold"}>
+                            {step.status === "ok" ? "\u2713" : "\u2717"}
+                          </span>
+                          <span className="text-gray-300 font-medium">{step.message}</span>
+                        </div>
+                      );
+                    })}
+                  </div>
                 </div>
               )}
             </div>
@@ -327,18 +338,18 @@ export default function HotspotWizard({ isOpen, onClose }) {
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-between p-6 border-t border-gray-700">
+        <div className="modal-footer">
           <button
             onClick={() => setCurrentStep(s => Math.max(0, s - 1))}
             disabled={currentStep === 0}
-            className="px-4 py-2 text-gray-400 hover:text-white disabled:opacity-30"
+            className="px-4 py-2 bg-transparent hover:bg-gray-900 border border-gray-800 text-gray-400 hover:text-white disabled:opacity-30 text-xs font-semibold rounded-xl transition-all cursor-pointer"
           >
             Voltar
           </button>
           <div className="flex gap-2">
             <button
               onClick={onClose}
-              className="px-4 py-2 text-gray-400 hover:text-white"
+              className="px-4 py-2 bg-transparent hover:bg-gray-900 border border-gray-800 text-gray-400 hover:text-white text-xs font-semibold rounded-xl transition-all cursor-pointer"
             >
               Fechar
             </button>
@@ -346,9 +357,9 @@ export default function HotspotWizard({ isOpen, onClose }) {
               <button
                 onClick={() => setCurrentStep(s => s + 1)}
                 disabled={!canNext()}
-                className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-500 disabled:opacity-50"
+                className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-semibold text-xs py-2 px-4 rounded-xl shadow-lg hover:shadow-xl disabled:opacity-50 transition-all cursor-pointer"
               >
-                Proximo
+                Próximo
               </button>
             )}
           </div>
