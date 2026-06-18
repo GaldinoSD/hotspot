@@ -148,6 +148,17 @@ export default function AdminLayout({ children }) {
       )
     },
     {
+      key: "financeiro",
+      permission: "pagamentos",
+      title: "Financeiro",
+      path: `${basePath}/financeiro`,
+      icon: (
+        <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+      )
+    },
+    {
       key: "clientes_group",
       title: "Clientes",
       icon: (
@@ -218,14 +229,14 @@ export default function AdminLayout({ children }) {
         if (!child.key || child.key === 'dashboard') return true;
         if (isSuperAdmin) return true;
         if (child.key === 'empresas' || child.key === 'grupos-permissao' || child.key === 'logs') return false;
-        return hasPermission(child.key, 'ver');
+        return hasPermission(child.permission || child.key, 'ver');
       });
       return filteredChildren.length > 0 ? { ...item, children: filteredChildren } : null;
     }
     if (!item.key || item.key === 'dashboard') return item;
     if (isSuperAdmin) return item;
     if (item.key === 'empresas' || item.key === 'grupos-permissao' || item.key === 'logs') return null;
-    return hasPermission(item.key, 'ver') ? item : null;
+    return hasPermission(item.permission || item.key, 'ver') ? item : null;
   }).filter(Boolean);
 
   const isActive = (path) => {

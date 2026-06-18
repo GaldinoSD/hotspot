@@ -13,6 +13,15 @@ exports.login = async (req, res) => {
   const match = await bcrypt.compare(pass, user.password)
   if (!match) return res.status(401).json({ error: 'Senha incorreta' })
 
+  if (user.totp_enabled === 1) {
+    const tempToken = jwt.sign(
+      { id: user.id, requires_2fa: true },
+      process.env.JWT_SECRET,
+      { expiresIn: '5m' }
+    );
+    return res.json({ requires_2fa: true, temp_token: tempToken });
+  }
+
   // Buscar todas as empresas do usuário
   const empresas = await Admin.getEmpresas(user.id, user.role);
 
@@ -108,5 +117,89 @@ exports.switchEmpresa = async (req, res) => {
   } catch (err) {
     console.error('Erro ao trocar empresa:', err);
     res.status(500).json({ error: 'Erro ao trocar empresa' });
+  }
+}
+
+exports.verify2FA = async (req, res) => {
+  try {
+    const { temp_token, code } = req.body;
+    if (!temp_token || !code) {
+      return res.status(400).json({ error: 'Token temporário e código são obrigatórios' });
+    }
+
+    let decoded;
+    try {
+      decoded = jwt.verify(temp_token, process.env.JWT_SECRET);
+    } catch (jwtErr) {
+      return res.status(401).json({ error: 'Sessão expirada ou inválida. Refaça o login' });
+    }
+
+    if (!decoded.requires_2fa) {
+      return res.status(400).json({ error: 'Token inválido para fluxo de 2FA' });
+    }
+
+    const user = await Admin.findById(decoded.id);
+    if (!user || !user.totp_enabled || !user.totp_secret) {
+      return res.status(400).json({ error: '2FA não está ativado para este usuário' });
+    }
+
+    const speakeasy = require('speakeasy');
+    const isValid = speakeasy.totp.verify({
+      secret: user.totp_secret,
+      encoding: 'base32',
+      token: code,
+      window: 1
+    });
+    if (!isValid) {
+      return res.status(400).json({ error: 'Código de autenticação incorreto ou expirado' });
+    }
+
+    // Buscar todas as empresas do usuário (exatamente como login normal)
+    const empresas = await Admin.getEmpresas(user.id, user.role);
+
+    if (empresas.length === 0) {
+      return res.status(403).json({ error: 'Você não possui vínculo com nenhuma empresa ativa' });
+    }
+
+    const empresaAtiva = empresas.find(e => e.id === user.empresa_id) || empresas[0] || null;
+
+    const token = jwt.sign(
+      {
+        id: user.id,
+        email: user.email,
+        empresa_id: empresaAtiva?.id || user.empresa_id,
+        empresa_slug: empresaAtiva?.slug || user.empresa_slug || 'default',
+        empresa_nome: empresaAtiva?.nome || user.empresa_nome || 'Empresa Padrão',
+        role: user.role || 'operator'
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: '1d' }
+    )
+
+    // Buscar permissões consolidadas do admin
+    let permissoes = {};
+    if (user.role === 'super_admin') {
+      for (const m of MODULOS) permissoes[m] = { ver: true, criar: true, editar: true, excluir: true };
+    } else {
+      permissoes = await getPermissoesConsolidadas(user.id);
+    }
+
+    res.json({
+      token,
+      user: {
+        id: user.id,
+        email: user.email,
+        nome: user.nome,
+        role: user.role || 'operator',
+        empresa_id: empresaAtiva?.id || user.empresa_id,
+        empresa_slug: empresaAtiva?.slug || user.empresa_slug || 'default',
+        empresa_nome: empresaAtiva?.nome || user.empresa_nome || 'Empresa Padrão'
+      },
+      empresas,
+      permissoes
+    });
+  } catch (err) {
+    console.error('Erro na verificação de 2FA:', err);
+    res.status(500).json({ error: 'Erro ao processar verificação de 2FA' });
   }
 }

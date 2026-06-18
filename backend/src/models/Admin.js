@@ -24,8 +24,20 @@ const findAll = async (empresa_id) => {
 };
 
 const findById = async (id) => {
-  const [rows] = await db.execute('SELECT id, email, nome, role, empresa_id FROM admins WHERE id = ?', [id]);
+  const [rows] = await db.execute('SELECT id, email, nome, role, empresa_id, totp_enabled, totp_secret, password FROM admins WHERE id = ?', [id]);
   return rows[0];
+};
+
+const updateTotpSecret = async (id, secret) => {
+  await db.execute('UPDATE admins SET totp_secret = ?, totp_enabled = 0 WHERE id = ?', [secret, id]);
+};
+
+const enableTotp = async (id) => {
+  await db.execute('UPDATE admins SET totp_enabled = 1 WHERE id = ?', [id]);
+};
+
+const disableTotp = async (id) => {
+  await db.execute('UPDATE admins SET totp_secret = NULL, totp_enabled = 0 WHERE id = ?', [id]);
 };
 
 const create = async (email, passwordHash, empresa_id, role = 'operator', nome = null) => {
@@ -78,4 +90,7 @@ module.exports = {
   remove,
   updatePassword,
   getEmpresas,
+  updateTotpSecret,
+  enableTotp,
+  disableTotp,
 };

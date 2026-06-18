@@ -67,6 +67,8 @@ function EmpresasModal({ open, onClose }) {
     e.slug?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  if (!open) return null;
+
   return (
     <div className="modal-overlay">
       <div className="modal-container max-w-4xl">
@@ -266,6 +268,8 @@ function BackupsModal({ open, onClose }) {
     } catch { setMessage({ type: "error", text: "Erro de conexão." }); }
     finally { setActionLoading(false); }
   };
+
+  if (!open) return null;
 
   return (
     <div className="modal-overlay">

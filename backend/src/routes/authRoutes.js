@@ -4,6 +4,7 @@ const auth = require('../middleware/auth')
 const authController = require('../controllers/authController')
 
 router.post('/login', authController.login)
+router.post('/verify-2fa', authController.verify2FA)
 router.post('/switch-empresa', auth, authController.switchEmpresa)
 router.get('/me/empresas', auth, async (req, res) => {
   const Admin = require('../models/Admin');

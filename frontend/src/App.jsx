@@ -7,6 +7,7 @@ import Monitoramento from "./pages/admin/Monitoramento";
 import Planos from "./pages/admin/Planos";
 import Configuracoes from "./pages/admin/Configuracoes";
 import Pagamentos from "./pages/admin/Pagamentos";
+import DashboardFinanceiro from "./pages/admin/DashboardFinanceiro";
 import UsuariosRadius from "./pages/admin/UsuariosRadius";
 import LgpdCadastros from "./pages/admin/LgpdCadastros";
 import Sessoes from "./pages/admin/Sessoes";
@@ -86,6 +87,7 @@ function App() {
       <Route path="/admin/:empresaSlug/planos" element={<RotaPrivada><Planos /></RotaPrivada>} />
       <Route path="/admin/:empresaSlug/configuracoes" element={<RotaPrivada><Configuracoes /></RotaPrivada>} />
       <Route path="/admin/:empresaSlug/pagamentos" element={<RotaPrivada><Pagamentos /></RotaPrivada>} />
+      <Route path="/admin/:empresaSlug/financeiro" element={<RotaPrivada><DashboardFinanceiro /></RotaPrivada>} />
       <Route path="/admin/:empresaSlug/radius" element={<RotaPrivada><UsuariosRadius /></RotaPrivada>} />
       <Route path="/admin/:empresaSlug/lgpd" element={<RotaPrivada><LgpdCadastros /></RotaPrivada>} />
       <Route path="/admin/:empresaSlug/sessoes" element={<RotaPrivada><Sessoes /></RotaPrivada>} />
