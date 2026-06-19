@@ -364,7 +364,7 @@
 .modal-body select,
 .modal-body textarea {
   background-color: #151724 !important;
-  border-color: #323652 !important;
+  border: 1px solid #323652 !important;
 }
 
 .modal-body input:not([type="checkbox"]):not([type="radio"]):focus,

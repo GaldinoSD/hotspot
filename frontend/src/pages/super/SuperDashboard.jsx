@@ -71,7 +71,7 @@ function EmpresasModal({ open, onClose }) {
 
   return (
     <div className="modal-overlay">
-      <div className="modal-container max-w-4xl">
+      <div className="modal-container max-w-4xl max-h-[85vh] flex flex-col min-h-0">
         {/* Header */}
         <div className="modal-header">
           <div className="modal-title">
@@ -162,52 +162,52 @@ function EmpresasModal({ open, onClose }) {
             </div>
           ))}
         </div>
-
-        {/* Form Sub-Modal */}
-        {showForm && (
-          <div className="modal-overlay z-[60]">
-            <div className="modal-container max-w-md">
-              <div className="modal-header">
-                <h3 className="modal-title">
-                  <Building2 className="w-5 h-5 text-emerald-400" />
-                  {editId ? "Editar Empresa" : "Nova Empresa"}
-                </h3>
-                <button onClick={() => setShowForm(false)} className="modal-close-btn" title="Fechar"><X className="w-5 h-5"/></button>
-              </div>
-              <form onSubmit={handleSubmit} className="flex flex-col flex-1 overflow-hidden">
-                <div className="modal-body space-y-4">
-                  <div>
-                    <label className="block text-[10px] text-gray-400 mb-2 font-bold uppercase tracking-wider">Nome</label>
-                    <input type="text" required placeholder="Ex: Empresa ABC" value={form.nome} onChange={(e) => setForm({...form, nome: e.target.value})}
-                      className="w-full px-4 py-2.5 text-white rounded-xl focus:outline-none text-xs transition-all" />
-                  </div>
-                  <div>
-                    <label className="block text-[10px] text-gray-400 mb-2 font-bold uppercase tracking-wider">Email</label>
-                    <input type="email" required placeholder="contato@empresa.com" value={form.email} onChange={(e) => setForm({...form, email: e.target.value})}
-                      className="w-full px-4 py-2.5 text-white rounded-xl focus:outline-none text-xs transition-all" />
-                  </div>
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <label className="block text-[10px] text-gray-400 mb-2 font-bold uppercase tracking-wider">CNPJ</label>
-                      <input type="text" placeholder="00.000.000/0000-00" value={form.cnpj} onChange={(e) => setForm({...form, cnpj: e.target.value})}
-                        className="w-full px-4 py-2.5 text-white rounded-xl focus:outline-none text-xs transition-all font-mono" />
-                    </div>
-                    <div>
-                      <label className="block text-[10px] text-gray-400 mb-2 font-bold uppercase tracking-wider">Telefone</label>
-                      <input type="text" placeholder="(00) 00000-0000" value={form.telefone} onChange={(e) => setForm({...form, telefone: e.target.value})}
-                        className="w-full px-4 py-2.5 text-white rounded-xl focus:outline-none text-xs transition-all" />
-                    </div>
-                  </div>
-                </div>
-                <div className="modal-footer">
-                  <button type="button" onClick={() => setShowForm(false)} className="px-4 py-2 bg-transparent hover:bg-gray-900 border border-gray-800 text-gray-300 text-xs font-semibold rounded-xl transition-colors cursor-pointer">Cancelar</button>
-                  <button type="submit" className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-semibold text-xs py-2 px-4 rounded-xl shadow-lg hover:shadow-xl transition-all cursor-pointer">{editId ? "Salvar" : "Criar"}</button>
-                </div>
-              </form>
-            </div>
-          </div>
-        )}
       </div>
+
+      {/* Form Sub-Modal */}
+      {showForm && (
+        <div className="modal-overlay z-[60]">
+          <div className="modal-container max-w-md max-h-[85vh] flex flex-col min-h-0">
+            <div className="modal-header">
+              <h3 className="modal-title">
+                <Building2 className="w-5 h-5 text-emerald-400" />
+                {editId ? "Editar Empresa" : "Nova Empresa"}
+              </h3>
+              <button onClick={() => setShowForm(false)} className="modal-close-btn" title="Fechar"><X className="w-5 h-5"/></button>
+            </div>
+            <form onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-0 overflow-hidden">
+              <div className="modal-body space-y-4">
+                <div>
+                  <label className="block text-[10px] text-gray-400 mb-2 font-bold uppercase tracking-wider">Nome</label>
+                  <input type="text" required placeholder="Ex: Empresa ABC" value={form.nome} onChange={(e) => setForm({...form, nome: e.target.value})}
+                    className="w-full px-4 py-2.5 text-white rounded-xl focus:outline-none text-xs transition-all" />
+                </div>
+                <div>
+                  <label className="block text-[10px] text-gray-400 mb-2 font-bold uppercase tracking-wider">Email</label>
+                  <input type="email" required placeholder="contato@empresa.com" value={form.email} onChange={(e) => setForm({...form, email: e.target.value})}
+                    className="w-full px-4 py-2.5 text-white rounded-xl focus:outline-none text-xs transition-all" />
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-[10px] text-gray-400 mb-2 font-bold uppercase tracking-wider">CNPJ</label>
+                    <input type="text" placeholder="00.000.000/0000-00" value={form.cnpj} onChange={(e) => setForm({...form, cnpj: e.target.value})}
+                      className="w-full px-4 py-2.5 text-white rounded-xl focus:outline-none text-xs transition-all font-mono" />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] text-gray-400 mb-2 font-bold uppercase tracking-wider">Telefone</label>
+                    <input type="text" placeholder="(00) 00000-0000" value={form.telefone} onChange={(e) => setForm({...form, telefone: e.target.value})}
+                      className="w-full px-4 py-2.5 text-white rounded-xl focus:outline-none text-xs transition-all" />
+                  </div>
+                </div>
+              </div>
+              <div className="modal-footer">
+                <button type="button" onClick={() => setShowForm(false)} className="px-4 py-2 bg-transparent hover:bg-gray-900 border border-gray-800 text-gray-300 text-xs font-semibold rounded-xl transition-colors cursor-pointer">Cancelar</button>
+                <button type="submit" className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-semibold text-xs py-2 px-4 rounded-xl shadow-lg hover:shadow-xl transition-all cursor-pointer">{editId ? "Salvar" : "Criar"}</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -397,7 +397,7 @@ function AtualizarModal({ open, onClose }) {
       const token = localStorage.getItem("admin_token");
       const res = await fetch("/api/system-update/check", { method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` }, body: JSON.stringify({ email: email.trim() }) });
       const data = await res.json();
-      if (!res.ok || !data.authorized) { setErrorMsg(data.message || "Assinatura não autorizada."); setStep("error"); return; }
+       if (!res.ok || !data.authorized) { setErrorMsg(data.message || "Senha/token de atualização inválido ou não autorizado."); setStep("error"); return; }
       if (!data.updates || data.updates.length === 0) { setDoneMsg("Sistema já está na versão mais recente."); setStep("done"); return; }
       setUpdates(data.updates); setStep("updates");
     } catch { setErrorMsg("Erro ao verificar atualizações."); setStep("error"); }
@@ -452,7 +452,7 @@ function AtualizarModal({ open, onClose }) {
 
   return (
     <div className="modal-overlay">
-      <div className="modal-container max-w-xl">
+      <div className="modal-container max-w-xl max-h-[85vh] flex flex-col min-h-0">
         <div className="modal-header">
           <div className="modal-title">
             <div className="w-9 h-9 rounded-xl bg-blue-500/15 border border-blue-800/30 flex items-center justify-center"><RefreshCw className="w-4 h-4 text-blue-400" /></div>
@@ -467,10 +467,10 @@ function AtualizarModal({ open, onClose }) {
         <div className="modal-body space-y-4">
           {step === "email" && (
             <form onSubmit={handleCheck} className="space-y-4">
-              <p className="text-xs text-gray-400 leading-relaxed">Informe o email Hotmart para validar sua assinatura.</p>
+              <p className="text-xs text-gray-400 leading-relaxed">Informe a senha ou token do servidor para validar o acesso.</p>
               <div>
-                <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">Email Hotmart</label>
-                <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="seu@email.com" required
+                <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">Senha / Token do Servidor</label>
+                <input type="password" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Insira a senha do servidor" required
                   className="w-full bg-[#151724] border border-[#323652] focus:border-blue-500 rounded-xl px-4 py-2.5 text-white placeholder-gray-600 focus:outline-none text-xs transition-all" />
               </div>
               <button type="submit" className="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-xl text-xs uppercase tracking-wider shadow-md cursor-pointer">Verificar Atualizações</button>
@@ -480,7 +480,7 @@ function AtualizarModal({ open, onClose }) {
           {step === "checking" && (
             <div className="flex flex-col items-center py-10 gap-4">
               <div className="w-14 h-14 border-4 border-gray-700 border-t-blue-500 rounded-full animate-spin"></div>
-              <div className="text-center"><p className="text-white font-bold">Verificando...</p><p className="text-gray-500 text-sm mt-0.5">Validando assinatura</p></div>
+              <div className="text-center"><p className="text-white font-bold">Verificando...</p><p className="text-gray-500 text-sm mt-0.5">Validando token do servidor</p></div>
             </div>
           )}
 

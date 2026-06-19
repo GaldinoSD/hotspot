@@ -4,7 +4,7 @@
 
 Sistema completo de gerenciamento de Hotspot WiFi com captive portal, autenticacao RADIUS, integracao MikroTik, pagamentos (Mercado Pago / EFI PIX), conformidade LGPD e Marco Civil da Internet. Arquitetura multi-tenant com isolamento por empresa.
 
-**Servidor de producao:** glpi.forumtelecom.com.br
+**Servidor de producao:** hotspot.solutecno.com.br
 **Diretorio:** /var/www/hotspot
 
 ---
@@ -102,7 +102,7 @@ Arquivo: `/var/www/hotspot/backend/.env`
 | DB_NAME | Nome do banco | hotspot |
 | DB_PORT | Porta MySQL (opcional) | 3306 |
 | JWT_SECRET | Segredo para tokens JWT | segredo_super_secreto |
-| WHATSAPP_API_URL | URL da API WhatsApp | https://glpi.forumtelecom.com.br |
+| WHATSAPP_API_URL | URL da API WhatsApp | https://hotspot.solutecno.com.br |
 
 **Nota:** Configuracoes de pagamento (Mercado Pago, EFI) ficam no banco de dados na tabela `empresa_configs`, nao em .env.
 

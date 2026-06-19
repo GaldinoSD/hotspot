@@ -407,7 +407,7 @@ WG_PASS=${WG_PASS}
 WG_PANEL_PORT=${WG_PANEL_PORT}
 
 # Sistema de Atualizacoes OTA
-UPDATE_SERVER_URL=https://glpi.forumtelecom.com.br
+UPDATE_SERVER_URL=https://hotspot.solutecno.com.br
 EOF
 echo "  .env gerado"
 

@@ -51,7 +51,7 @@ export default function AtualizarSistema() {
       });
       const data = await res.json();
       if (!res.ok || !data.authorized) {
-        setErrorMsg(data.message || "Assinatura nao autorizada ou email invalido.");
+        setErrorMsg(data.message || "Senha/token de atualizacao invalido ou nao autorizado.");
         setStep("error");
         return;
       }
@@ -259,25 +259,25 @@ export default function AtualizarSistema() {
             <div className="mb-6">
               <div className="flex items-center gap-3 mb-3">
                 <div className="w-10 h-10 rounded-xl bg-blue-600/15 border border-blue-800/30 flex items-center justify-center">
-                  <Mail className="w-5 h-5 text-blue-400" />
+                  <Shield className="w-5 h-5 text-blue-400" />
                 </div>
                 <h2 className="text-xl font-bold text-white">Verificar Atualizacoes</h2>
               </div>
               <p className="text-gray-400 text-sm leading-relaxed">
-                Informe o email cadastrado no Hotmart para validar sua assinatura e verificar se ha atualizacoes disponiveis.
+                Informe a senha ou token do servidor para validar o acesso e verificar se ha atualizacoes disponiveis.
               </p>
             </div>
 
             <form onSubmit={handleCheck} className="space-y-4">
               <div>
                 <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">
-                  Email Hotmart
+                  Senha / Token do Servidor
                 </label>
                 <input
-                  type="email"
+                  type="password"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="seu@email.com"
+                  placeholder="Insira a senha do servidor"
                   required
                   className="w-full bg-[#0d1117] border border-gray-800 focus:border-blue-500 rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:outline-none transition-all text-sm"
                 />
@@ -300,7 +300,7 @@ export default function AtualizarSistema() {
             </div>
             <div className="text-center">
               <p className="text-white text-lg font-bold">Verificando atualizacoes...</p>
-              <p className="text-gray-500 text-sm mt-1">Validando sua assinatura</p>
+              <p className="text-gray-500 text-sm mt-1">Validando token do servidor</p>
             </div>
           </div>
         )}

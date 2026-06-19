@@ -26,6 +26,21 @@ const IGNORE_PATTERNS = [
   '.log',
 ];
 
+// Prefixo para paths de arquivos fora de PROJECT_ROOT (ex: /etc/freeradius/)
+const EXTERNAL_PREFIX = 'external:';
+
+// Arquivos externos que o sistema de updates tambem rastreia e distribui.
+// Adicione caminhos absolutos de configs que precisam ser versionados.
+const EXTERNAL_ASSETS = [
+  '/etc/freeradius/3.0/mods-enabled/sql',
+  '/etc/freeradius/3.0/mods-available/sql',
+  '/etc/freeradius/3.0/sites-enabled/default',
+  '/etc/freeradius/3.0/sites-available/default',
+  '/etc/freeradius/3.0/dictionary',
+  '/etc/freeradius/3.0/mods-enabled/sqlcounter',
+  '/etc/freeradius/3.0/mods-available/sqlcounter',
+];
+
 function shouldIgnore(filePath) {
   return IGNORE_PATTERNS.some(pattern => filePath.includes(pattern));
 }

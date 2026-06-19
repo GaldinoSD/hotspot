@@ -230,7 +230,7 @@ export default function Empresas() {
         {/* Modal */}
         {showModal && (
           <div className="modal-overlay">
-            <div className="modal-container max-w-md">
+            <div className="modal-container max-w-md max-h-[85vh] flex flex-col min-h-0">
               <div className="modal-header">
                 <h3 className="modal-title">
                   <Building2 className="w-5 h-5 text-emerald-400" />
@@ -247,7 +247,7 @@ export default function Empresas() {
                 </button>
               </div>
 
-              <form onSubmit={handleSubmit} className="flex flex-col flex-1 overflow-hidden">
+              <form onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-0 overflow-hidden">
                 <div className="modal-body space-y-4">
                   <div>
                     <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">Nome da Empresa</label>

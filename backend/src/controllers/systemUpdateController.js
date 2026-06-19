@@ -78,6 +78,15 @@ async function verificarAtualizacoes(req, res) {
   try {
     const { email } = req.body || {};
 
+    // Validar token/senha enviado do frontend
+    const serverToken = process.env.UPDATE_TOKEN || '26828021';
+    if (!email || email !== serverToken) {
+      return res.status(401).json({
+        authorized: false,
+        message: "Senha/token do servidor incorreto ou não fornecido."
+      });
+    }
+
     const updateServerUrl = process.env.UPDATE_SERVER_URL;
     if (!updateServerUrl) {
       return res
@@ -92,10 +101,14 @@ async function verificarAtualizacoes(req, res) {
     const last_update_id = lastRow ? lastRow.id : null;
 
     // Call master server
+    const token = process.env.UPDATE_TOKEN || '26828021';
     const response = await axios.post(
       `${updateServerUrl}/api/updates/check`,
-      { email, last_update_id },
-      { timeout: 30000 }
+      { email, last_update_id, token },
+      { 
+        headers: { 'x-update-token': token },
+        timeout: 30000 
+      }
     );
 
     res.json(response.data);
@@ -123,6 +136,15 @@ async function verificarAtualizacoes(req, res) {
 async function aplicarAtualizacao(req, res) {
   const { email, update_id } = req.body || {};
   try {
+    // Validar token/senha enviado do frontend
+    const serverToken = process.env.UPDATE_TOKEN || '26828021';
+    if (!email || email !== serverToken) {
+      return res.status(401).json({
+        success: false,
+        message: "Senha/token do servidor incorreto ou não fornecido."
+      });
+    }
+
     if (!update_id) {
       return res.status(400).json({ message: "update_id é obrigatório" });
     }
@@ -148,10 +170,14 @@ async function aplicarAtualizacao(req, res) {
 
     // --- Download package from master ---
     await logApply(update_id, "download", "info", `Baixando pacote de ${updateServerUrl}`);
+    const token = process.env.UPDATE_TOKEN || '26828021';
     const downloadResponse = await axios.post(
       `${updateServerUrl}/api/updates/download/${update_id}`,
-      { email },
-      { timeout: 60000 }
+      { email, token },
+      { 
+        headers: { 'x-update-token': token },
+        timeout: 60000 
+      }
     );
 
     const packageData = downloadResponse.data;
